@@ -1,0 +1,35 @@
+[package]
+name = "tcx-chain"
+version = "0.1.0"
+authors = ["Neal Xu <imxuneal@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+tcx-crypto = { path = "../tcx-crypto" }
+tcx-primitive = { path = "../tcx-primitive" }
+tcx-constants = { path = "../tcx-constants" }
+
+bitcoin = "0.25.1"
+byteorder = "1.2"
+secp256k1 = {version ="0.19.0", features = ["rand", "recovery"] }
+tiny-bip39 = "0.6.2"
+bitcoin_hashes = "0.9.3"
+uuid = { version = "0.7", features = ["serde", "v4"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.39"
+failure = "0.1.5"
+regex = "1"
+hex = "0.4.0"
+
+prost = "0.6.1"
+bytes = "0.5.4"
+
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false
+features = ["precommit-hook", "run-cargo-fmt"]
+
+
+[features]
+default = []
+cache_dk = []

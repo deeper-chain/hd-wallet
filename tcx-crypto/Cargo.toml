@@ -1,0 +1,32 @@
+[package]
+name = "tcx-crypto"
+version = "0.1.0"
+authors = ["Neal Xu <imxuneal@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+tcx-constants = {path="../tcx-constants"}
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+rand = "0.6"
+tiny-keccak = "1.4"
+scrypt = { version = "0.2", default-features = false }
+sha2 = "0.8.0"
+digest = "0.8"
+hmac = "0.7"
+block-modes = "0.3.3"
+aes-ctr = "0.3.0"
+aes-soft = "0.3.3"
+pbkdf2 = "0.3.0"
+bitcoin_hashes = "0.9.3"
+crypto-mac = "0.7.0"
+failure = "0.1.5"
+secp256k1 = {version ="0.19.0", features = ["rand", "recovery"] }
+hex = "0.4.0"
+lazy_static = "1.4.0"
+
+parking_lot = "0.10"
+
+[features]
+default = []
+cache_dk = []
