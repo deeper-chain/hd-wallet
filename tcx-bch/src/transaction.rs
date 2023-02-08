@@ -36,13 +36,12 @@ impl SignHasher for BchSignHasher {
 pub type BchTransaction =
     BitcoinForkSinger<BchAddress, LegacyTransactionSignComponent<BchSignHasher>>;
 
-
-pub fn bch_sign_to_tx(sk: &str, amount: i64, address: &str) -> String{
+pub fn bch_sign_to_tx(sk: &str, amount: i64, address: &str) -> String {
     let utxo = Utxo {
         tx_hash: "09c3a49c1d01f6341c43ea43dd0de571664a45b4e7d9211945cb3046006a98e2".to_string(),
         vout: 0,
         amount: amount,
-        address: address.to_string(),        
+        address: address.to_string(),
         script_pub_key: "76a91488d9931ea73d60eaf7e5671efc0552b912911f2a88ac".to_string(),
         derived_path: "1/0".to_string(),
         sequence: 0,
@@ -66,13 +65,9 @@ pub fn bch_sign_to_tx(sk: &str, amount: i64, address: &str) -> String{
         _marker_t: PhantomData,
     };
 
-    let prv_key = Secp256k1PrivateKey::from_slice(
-        &hex::decode(sk).unwrap(),
-    )
-    .unwrap();
+    let prv_key = Secp256k1PrivateKey::from_slice(&hex::decode(sk).unwrap()).unwrap();
 
-    let change_addr =
-        BchAddress::from_str(address).unwrap();
+    let change_addr = BchAddress::from_str(address).unwrap();
     let expected = tran
         .sign_transaction(&vec![prv_key], change_addr.script_pub_key())
         .unwrap();

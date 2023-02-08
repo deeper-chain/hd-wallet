@@ -13,11 +13,15 @@ tcx-btc-fork = { path = "../tcx-btc-fork" }
 tcx-chain = { path = "../tcx-chain" }
 tcx-bch = { path = "../tcx-bch" }
 tcx-substrate = { path = "../tcx-substrate" }
+tcx-tron = { path = "../tcx-tron" }
+tcx-tezos = { path = "../tcx-tezos" }
+tcx-filecoin = { path = "../tcx-filecoin" }
 
 hex = "0.4.0"
 tcx = { path = "../tcx" }
 prost = "0.6.1"
 bytes = "0.5.4"
+prost-types = "0.6.1"
 
 bch_addr = "0.1.0"
 bitcoin = "0.25.1"

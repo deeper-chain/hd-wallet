@@ -171,6 +171,7 @@ pub(crate) fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
     let param: HdStoreImportParam =
         HdStoreImportParam::decode(data).expect("import wallet from mnemonic");
 
+    println!("hd_store_import");
     let mut founded_id: Option<String> = None;
     {
         let key_hash = key_hash_from_mnemonic(&param.mnemonic)?;
@@ -182,6 +183,8 @@ pub(crate) fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
             founded_id = Some(founded.id());
         }
     }
+
+    println!("founded_id {:?}", founded_id);
 
     if founded_id.is_some() && !param.overwrite {
         return Err(format_err!("{}", "address_already_exist"));
@@ -200,7 +203,9 @@ pub(crate) fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
         keystore.set_id(&founded_id.unwrap());
     }
 
+    println!("flush_keystore");
     flush_keystore(&keystore)?;
+    println!("flush_keystore after");
 
     let meta = keystore.meta();
     let wallet = WalletResult {

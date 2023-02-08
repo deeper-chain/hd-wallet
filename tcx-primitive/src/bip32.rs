@@ -258,11 +258,7 @@ impl Ss58Codec for Bip32DeterministicPrivateKey {
 }
 
 pub fn mnemonic_convert_seed(mnemonic: &str) -> Seed {
-    let mn = Mnemonic::from_phrase(
-        mnemonic,
-        Language::English,
-    )
-    .unwrap();
+    let mn = Mnemonic::from_phrase(mnemonic, Language::English).unwrap();
     Seed::new(&mn, "")
 }
 

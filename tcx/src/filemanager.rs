@@ -29,6 +29,7 @@ pub fn flush_keystore(ks: &Keystore) -> Result<()> {
 
     let file_dir = WALLET_FILE_DIR.read();
     let ks_path = format!("{}/{}.json", file_dir, ks.id());
+    println!("ks_path {:?}", ks_path);
     let path = Path::new(&ks_path);
     let mut file = fs::File::create(path)?;
     let _ = file.write_all(&json.as_bytes());

@@ -66,13 +66,12 @@ impl DeterministicPublicKey for Sr25519PublicKey {
 }
 
 pub fn recover_pk_from_seed(seed: &str) -> String {
-    let seed = hex::decode(seed)
-        .unwrap();
+    let seed = hex::decode(seed).unwrap();
     let hd_key = Sr25519PrivateKey::from_seed(&seed).unwrap();
     let pk = hd_key.private_key();
     hex::encode(pk.0.public().to_vec())
 }
-    
+
 pub fn recover_pk_from_mnemonic(mnemonic: &str) -> String {
     let hd_key = Sr25519PrivateKey::from_mnemonic(mnemonic).unwrap();
     let pk = hd_key.private_key();
@@ -97,8 +96,6 @@ pub fn recover_pk_drive_from_mnemoic(mnemonic: &str, path: &str) -> String {
     let child_key: Sr25519PublicKey = hd_pub_key.derive(path).unwrap();
     hex::encode(child_key.to_bytes())
 }
-
-
 
 #[cfg(test)]
 mod tests {

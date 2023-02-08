@@ -7,8 +7,8 @@ use serde_json::Value;
 
 use tcx_chain::KeystoreGuard;
 use tcx_chain::{HdKeystore, Keystore, Metadata};
+use tcx_constants::CoinInfo;
 use tcx_constants::CurveType;
-use tcx_constants::{CoinInfo};
 
 const BIP_PATH: &str = "m/44'/145'/0'";
 
@@ -17,10 +17,10 @@ pub type Result<T> = result::Result<T, failure::Error>;
 #[macro_use]
 extern crate failure;
 
+pub use crate::address::{bch_address_from_pri_key, bch_address_from_pub_key};
+pub use crate::transaction::bch_sign_to_tx;
 pub use address::BchAddress;
 pub use transaction::BchTransaction;
-pub use crate::address::{bch_address_from_pub_key, bch_address_from_pri_key};
-pub use crate::transaction::bch_sign_to_tx;
 
 #[derive(Fail, Debug)]
 pub enum Error {
@@ -61,9 +61,8 @@ pub fn bch_account_recover(mnemonic: &str, password: &str) -> serde_json::Value 
     let mut meta = Metadata::default();
     meta.name = "BCH".to_string();
     meta.password_hint = 5.to_string();
-    
-    let mut keystore =
-        Keystore::Hd(HdKeystore::from_mnemonic(mnemonic, password, meta).unwrap());
+
+    let mut keystore = Keystore::Hd(HdKeystore::from_mnemonic(mnemonic, password, meta).unwrap());
 
     let bch_coin = CoinInfo {
         coin: "BITCOINCASH".to_string(),

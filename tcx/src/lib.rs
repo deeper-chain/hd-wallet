@@ -26,6 +26,7 @@ mod filemanager;
 use crate::handler::{
     export_substrate_keystore, get_public_key, import_substrate_keystore, substrate_keystore_exists,
 };
+use error_handling::Result;
 use parking_lot::RwLock;
 
 extern crate serde_json;
@@ -37,6 +38,37 @@ extern crate lazy_static;
 
 lazy_static! {
     pub static ref IS_DEBUG: RwLock<bool> = RwLock::new(false);
+}
+
+fn _to_c_char(str: &str) -> *const c_char {
+    CString::new(str).unwrap().into_raw()
+}
+
+fn _to_str(json_str: *const c_char) -> &'static str {
+    let json_c_str = unsafe { CStr::from_ptr(json_str) };
+    json_c_str.to_str().unwrap()
+}
+
+pub fn call_api(method: &str, msg: impl Message) -> Result<Vec<u8>> {
+    let param = TcxAction {
+        method: method.to_string(),
+        param: Some(::prost_types::Any {
+            type_url: "imtoken".to_string(),
+            value: encode_message(msg).unwrap(),
+        }),
+    };
+    let _ = unsafe { clear_err() };
+    let param_bytes = encode_message(param).unwrap();
+    let param_hex = hex::encode(param_bytes);
+    let ret_hex = unsafe { _to_str(call_tcx_api(_to_c_char(&param_hex))) };
+    let err = unsafe { _to_str(get_last_err_message()) };
+    if !err.is_empty() {
+        let err_bytes = hex::decode(err).unwrap();
+        let err_ret: Response = Response::decode(err_bytes.as_slice()).unwrap();
+        Err(format_err!("{}", err_ret.error))
+    } else {
+        Ok(hex::decode(ret_hex).unwrap())
+    }
 }
 
 #[no_mangle]

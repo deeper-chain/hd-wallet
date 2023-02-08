@@ -9,9 +9,9 @@ use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 use tcx_btc_fork::{BtcForkAddress, PubKeyScript, ScriptPubKeyComponent};
 use tcx_chain::Address;
-use tcx_primitive::{PublicKey, PrivateKey, Secp256k1PrivateKey, TypedPublicKey};
 use tcx_constants::coin_info::coin_info_from_param;
 use tcx_constants::{CoinInfo, CurveType};
+use tcx_primitive::{PrivateKey, PublicKey, Secp256k1PrivateKey, TypedPublicKey};
 
 fn legacy_to_bch(addr: &str) -> Result<String> {
     let convert = Converter::new();
@@ -118,12 +118,7 @@ impl ScriptPubKeyComponent for BchAddress {
 pub fn bch_address_from_pub_key(pub_key: &str) -> String {
     let coin_info = coin_info_from_param("BITCOINCASH", "MAINNET", "NONE", "").unwrap();
     let addr = BchAddress::from_public_key(
-        &TypedPublicKey::from_slice(
-            CurveType::SECP256k1,
-            &hex::decode(pub_key)
-                .unwrap(),
-        )
-        .unwrap(),
+        &TypedPublicKey::from_slice(CurveType::SECP256k1, &hex::decode(pub_key).unwrap()).unwrap(),
         &coin_info,
     )
     .unwrap();
@@ -132,11 +127,8 @@ pub fn bch_address_from_pub_key(pub_key: &str) -> String {
 
 pub fn bch_address_from_pri_key(pri_key: &str) -> String {
     let coin_info = coin_info_from_param("BITCOINCASH", "MAINNET", "NONE", "").unwrap();
-    let sk =
-        Secp256k1PrivateKey::from_wif(pri_key)
-            .unwrap();
-    let pk =
-        TypedPublicKey::from_slice(CurveType::SECP256k1, &sk.public_key().to_bytes()).unwrap();
+    let sk = Secp256k1PrivateKey::from_wif(pri_key).unwrap();
+    let pk = TypedPublicKey::from_slice(CurveType::SECP256k1, &sk.public_key().to_bytes()).unwrap();
     let addr = BchAddress::from_public_key(&pk, &coin_info).unwrap();
     addr
 }

@@ -28,8 +28,11 @@ pub use crate::ecc::{
 pub use crate::ed25519::{Ed25519PrivateKey, Ed25519PublicKey};
 pub use crate::rand::generate_mnemonic;
 
-pub use crate::subkey::{recover_pk_from_seed, recover_pk_from_mnemonic, recover_sk_drive_from_mnemoic, recover_address_from_mnemonic, recover_pk_drive_from_mnemoic};
-pub use crate::bip32::{mnemonic_convert_seed};
+pub use crate::bip32::mnemonic_convert_seed;
+pub use crate::subkey::{
+    recover_address_from_mnemonic, recover_pk_drive_from_mnemoic, recover_pk_from_mnemonic,
+    recover_pk_from_seed, recover_sk_drive_from_mnemoic,
+};
 
 pub use crate::secp256k1::{
     private_key_without_version, verify_private_key, Secp256k1PrivateKey, Secp256k1PublicKey,

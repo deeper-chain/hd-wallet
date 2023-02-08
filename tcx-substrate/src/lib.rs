@@ -4,7 +4,9 @@ mod signer;
 mod transaction;
 
 pub use address::SubstrateAddress;
-pub use keystore::{decode_substrate_keystore, encode_substrate_keystore, export_from_secret_key, SubstrateKeystore};
+pub use keystore::{
+    decode_substrate_keystore, encode_substrate_keystore, export_from_secret_key, SubstrateKeystore,
+};
 pub use transaction::{
     ExportSubstrateKeystoreResult, SubstrateKeystoreParam, SubstrateRawTxIn, SubstrateTxOut,
 };
