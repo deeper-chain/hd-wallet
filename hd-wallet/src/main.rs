@@ -34,6 +34,7 @@ fn main() {
     match args[1].as_str() {
         "generate" => println!("mnemonic: \"{}\"", tcx_primitive::generate_mnemonic()),
 
+        //————————————Substrate———————————//
         "substrate_pk_from_seed" => println!(
             "public key from seed: {}",
             tcx_primitive::recover_pk_from_seed(&args[2])
@@ -54,12 +55,12 @@ fn main() {
             "public key from mnemonic: {}",
             tcx_primitive::recover_pk_drive_from_mnemoic(&args[2], &args[3])
         ),
-
         "export_from_secret_key" => println!(
             "export_from_secret_key: {:?}",
             tcx_substrate::export_from_secret_key()
         ),
-        //————————Substrate———————————
+
+        //————————————BCH———————————//
         "bip39_mnemonic_convert_seed" => println!(
             "bip39 mnemonic convert seed: {:?} ",
             tcx_primitive::mnemonic_convert_seed(&args[2])
@@ -84,6 +85,7 @@ fn main() {
             tcx_bch::bch_account_recover(&args[2], &args[3])
         ),
 
+        //————————————BTC———————————//
         _ => main2(&args[1], &args[2]),
     }
 }
@@ -91,10 +93,10 @@ fn main() {
 fn main2(command: &str, content: &str) {
     match command {
         // api for substrate
-        "api_substrate_pk_from_mnemonic" => hd_import(content),
-        "get_public" => get_public(),
+        "hd_import" => hd_import(content),
+        "hd_working" => hd_working(),
 
-        _ => println!("error"),
+        _ => println!("bash:command not found!"),
     }
 }
 fn hd_import(mnemonic: &str) {
@@ -111,7 +113,7 @@ fn hd_import(mnemonic: &str) {
     println!("ret {:?}", ret);
 }
 
-fn get_public() {
+fn hd_working() {
     let empty = WalletKeyParam {
         id: "".to_string(),
         password: "".to_string(),
@@ -159,7 +161,7 @@ fn get_public() {
         chain_type: "KUSAMA".to_string(),
         address: derived_accounts.accounts.first().unwrap().address.clone(),
         input: Some(::prost_types::Any {
-            type_url: "imtoken".to_string(),
+            type_url: "deeper".to_string(),
             value: input_value.clone(),
         }),
     };
