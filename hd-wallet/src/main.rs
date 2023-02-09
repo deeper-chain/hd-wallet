@@ -35,44 +35,66 @@ fn main() {
 
     main2::func(args.clone());
     main3::func(args);
-
     // match args[1].as_str() {
     //     "generate" => println!("mnemonic: \"{}\"", tcx_primitive::generate_mnemonic()),
 
     //     //————————————Substrate———————————//
-    //     "substrate_pk_from_seed" => println!("public key from seed: {}", tcx_primitive::recover_pk_from_seed(&args[2])),
-    //     "substrate_pk_from_mnemonic" => println!("public key from mnemonic: {}", tcx_primitive::recover_pk_from_mnemonic(&args[2])),
-    //     "substrate_sk_drive_from_mnemonic" => println!("private key from mnemonic: {}", tcx_primitive::recover_sk_drive_from_mnemoic(&args[2], &args[3])),
-    //     "substrate_ss58" => println!("ss58 address from mnemonic: {}", tcx_primitive::recover_address_from_mnemonic(&args[2])),
-    //     "substrate_pk_drive_from_mnemonic" => println!("public key from mnemonic: {}", tcx_primitive::recover_pk_drive_from_mnemoic(&args[2], &args[3])),
-    //     "export_from_secret_key" => println!("export_from_secret_key: {:?}", tcx_substrate::export_from_secret_key()),
-        
-    //     //————————————BCH———————————//
-    //     "bip39_mnemonic_convert_seed"  => println!("bip39 mnemonic convert seed: {:?} ", tcx_primitive::mnemonic_convert_seed(&args[2])),
-    //     "bch_address_from_pub_key" => println!("bch_address from pub key: {}", tcx_bch::bch_address_from_pub_key(&args[2])),
-    //     "bch_address_from_pri_key" => println!("bch_address from pri key: {}", tcx_bch::bch_address_from_pri_key(&args[2])),
-    //     "bch_sign_tx" => println!("bch sign transaction: {}", tcx_bch::bch_sign_to_tx(&args[2], args[3].parse::<i64>().unwrap(), &args[4])),
-    //     "bch_account_create" => println!("keystore info: {}", tcx_bch::bch_account_create(&args[2])),
-    //     "bch_account_recover" => println!("keystore info: {}", tcx_bch::bch_account_recover(&args[2], &args[3])),
+    //     "substrate_pk_from_seed" => println!(
+    //         "public key from seed: {}",
+    //         tcx_primitive::recover_pk_from_seed(&args[2])
+    //     ),
+    //     "substrate_pk_from_mnemonic" => println!(
+    //         "public key from mnemonic: {}",
+    //         tcx_primitive::recover_pk_from_mnemonic(&args[2])
+    //     ),
+    //     "substrate_sk_drive_from_mnemonic" => println!(
+    //         "private key from mnemonic: {}",
+    //         tcx_primitive::recover_sk_drive_from_mnemoic(&args[2], &args[3])
+    //     ),
+    //     "substrate_ss58" => println!(
+    //         "ss58 address from mnemonic: {}",
+    //         tcx_primitive::recover_address_from_mnemonic(&args[2])
+    //     ),
+    //     "substrate_pk_drive_from_mnemonic" => println!(
+    //         "public key from mnemonic: {}",
+    //         tcx_primitive::recover_pk_drive_from_mnemoic(&args[2], &args[3])
+    //     ),
+    //     "export_from_secret_key" => println!(
+    //         "export_from_secret_key: {:?}",
+    //         tcx_substrate::export_from_secret_key()
+    //     ),
 
-    //     //————————————BTC———————————//
-    //     _ => main2::func(&args[1], &args[2]),
+    //     //————————————BCH———————————//
+    //     "bip39_mnemonic_convert_seed" => println!(
+    //         "bip39 mnemonic convert seed: {:?} ",
+    //         tcx_primitive::mnemonic_convert_seed(&args[2])
+    //     ),
+    //     "bch_address_from_pub_key" => println!(
+    //         "bch_address from pub key: {}",
+    //         tcx_bch::bch_address_from_pub_key(&args[2])
+    //     ),
+    //     "bch_address_from_pri_key" => println!(
+    //         "bch_address from pri key: {}",
+    //         tcx_bch::bch_address_from_pri_key(&args[2])
+    //     ),
+    //     "bch_sign_tx" => println!(
+    //         "bch sign transaction: {}",
+    //         tcx_bch::bch_sign_to_tx(&args[2], args[3].parse::<i64>().unwrap(), &args[4])
+    //     ),
+    //     "bch_account_create" => {
+    //         println!("keystore info: {}", tcx_bch::bch_account_create(&args[2]))
+    //     }
+    //     "bch_account_recover" => println!(
+    //         "keystore info: {}",
+    //         tcx_bch::bch_account_recover(&args[2], &args[3])
+    //     ),
     // }
 }
 
-fn main2(command: &str, content: &str) {
-    match command {
-        // api for substrate
-        "hd_import" => hd_import(content),
-        "hd_working" => hd_working(),       
-        
-        _ => println!("bash:command not found!"),
-    }
-}
-fn hd_import(mnemonic: &str) {
+fn hd_import(mnemonic: &str, password: &str) {
     let import_param = HdStoreImportParam {
         mnemonic: mnemonic.to_string(),
-        password: "".to_string(),
+        password: password.to_string(),
         source: "MNEMONIC".to_string(),
         name: "call_tcx_api".to_string(),
         password_hint: "deeper".to_string(),
@@ -83,16 +105,16 @@ fn hd_import(mnemonic: &str) {
     println!("ret {:?}", ret);
 }
 
-fn hd_working() {
+fn hd_working(json: &str, password: &str) {
     let empty = WalletKeyParam {
         id: "".to_string(),
-        password: "".to_string(),
+        password: password.to_string(),
     };
     let _ = call_api("scan_keystores", empty);
 
     let param = WalletKeyParam {
-        id: "ef403180-9a9e-4882-a99e-441ad9da7645".to_string(),
-        password: "".to_string(),
+        id: json.to_string(),
+        password: password.to_string(),
     };
     let ret = call_api("export_mnemonic", param).unwrap();
     let result: KeystoreCommonExportResult =
@@ -109,8 +131,8 @@ fn hd_working() {
         curve: "".to_string(),
     }];
     let param = KeystoreCommonDeriveParam {
-        id: "ef403180-9a9e-4882-a99e-441ad9da7645".to_string(),
-        password: "".to_string(),
+        id: json.to_string(),
+        password: password.to_string(),
         derivations,
     };
 
@@ -126,8 +148,8 @@ fn hd_working() {
 
     let input_value = encode_message(input);
     let tx = SignParam {
-        id: "ef403180-9a9e-4882-a99e-441ad9da7645".to_string(),
-        key: Some(tcx::api::sign_param::Key::Password("".to_string())),
+        id: json.to_string(),
+        key: Some(tcx::api::sign_param::Key::Password(password.to_string())),
         chain_type: "KUSAMA".to_string(),
         address: derived_accounts.accounts.first().unwrap().address.clone(),
         input: Some(::prost_types::Any {
