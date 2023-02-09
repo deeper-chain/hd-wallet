@@ -86,23 +86,23 @@ fn main() {
         ),
 
         //————————————BTC———————————//
-        _ => main2(&args[1], &args[2]),
+        _ => main2(&args[1], &args[2], &args[3]),
     }
 }
 
-fn main2(command: &str, content: &str) {
+fn main2(command: &str, content: &str, password: &str) {
     match command {
         // api for substrate
-        "hd_import" => hd_import(content),
-        "hd_working" => hd_working(),
+        "hd_import" => hd_import(content, password),
+        "hd_working" => hd_working(content, password),
 
         _ => println!("bash:command not found!"),
     }
 }
-fn hd_import(mnemonic: &str) {
+fn hd_import(mnemonic: &str, password: &str) {
     let import_param = HdStoreImportParam {
         mnemonic: mnemonic.to_string(),
-        password: "".to_string(),
+        password: password.to_string(),
         source: "MNEMONIC".to_string(),
         name: "call_tcx_api".to_string(),
         password_hint: "deeper".to_string(),
@@ -113,16 +113,16 @@ fn hd_import(mnemonic: &str) {
     println!("ret {:?}", ret);
 }
 
-fn hd_working() {
+fn hd_working(json: &str, password: &str) {
     let empty = WalletKeyParam {
         id: "".to_string(),
-        password: "".to_string(),
+        password: password.to_string(),
     };
     let _ = call_api("scan_keystores", empty);
 
     let param = WalletKeyParam {
-        id: "ef403180-9a9e-4882-a99e-441ad9da7645".to_string(),
-        password: "".to_string(),
+        id: json.to_string(),
+        password: password.to_string(),
     };
     let ret = call_api("export_mnemonic", param).unwrap();
     let result: KeystoreCommonExportResult =
@@ -139,8 +139,8 @@ fn hd_working() {
         curve: "".to_string(),
     }];
     let param = KeystoreCommonDeriveParam {
-        id: "ef403180-9a9e-4882-a99e-441ad9da7645".to_string(),
-        password: "".to_string(),
+        id: json.to_string(),
+        password: password.to_string(),
         derivations,
     };
 
@@ -156,8 +156,8 @@ fn hd_working() {
 
     let input_value = encode_message(input);
     let tx = SignParam {
-        id: "ef403180-9a9e-4882-a99e-441ad9da7645".to_string(),
-        key: Some(tcx::api::sign_param::Key::Password("".to_string())),
+        id: json.to_string(),
+        key: Some(tcx::api::sign_param::Key::Password(password.to_string())),
         chain_type: "KUSAMA".to_string(),
         address: derived_accounts.accounts.first().unwrap().address.clone(),
         input: Some(::prost_types::Any {
