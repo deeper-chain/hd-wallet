@@ -18,6 +18,9 @@ impl Address for SubstrateAddress {
             "POLKADOT" => sr_pk
                 .0
                 .to_ss58check_with_version(Ss58AddressFormat::PolkadotAccount),
+            "DEEPER" => sr_pk
+                .0
+                .to_ss58check_with_version(Ss58AddressFormat::SubstrateAccount),
             _ => "".to_owned(),
         };
 

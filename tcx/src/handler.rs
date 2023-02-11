@@ -76,7 +76,7 @@ fn derive_account<'a, 'b>(keystore: &mut Keystore, derivation: &Derivation) -> R
         "LITECOIN" => keystore.derive_coin::<BtcForkAddress>(&coin_info),
         "TRON" => keystore.derive_coin::<TrxAddress>(&coin_info),
         "NERVOS" => keystore.derive_coin::<CkbAddress>(&coin_info),
-        "POLKADOT" | "KUSAMA" => keystore.derive_coin::<SubstrateAddress>(&coin_info),
+        "POLKADOT" | "KUSAMA" | "DEEPER" => keystore.derive_coin::<SubstrateAddress>(&coin_info),
         "TEZOS" => keystore.derive_coin::<TezosAddress>(&coin_info),
         "FILECOIN" => keystore.derive_coin::<FilecoinAddress>(&coin_info),
         _ => Err(format_err!("unsupported_chain")),
@@ -203,9 +203,7 @@ pub(crate) fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
         keystore.set_id(&founded_id.unwrap());
     }
 
-    println!("flush_keystore");
     flush_keystore(&keystore)?;
-    println!("flush_keystore after");
 
     let meta = keystore.meta();
     let wallet = WalletResult {
@@ -482,7 +480,7 @@ pub(crate) fn export_private_key(data: &[u8]) -> Result<Vec<u8>> {
 
     // private_key prefix is only about chain type and network
     let coin_info = coin_info_from_param(&param.chain_type, &param.network, "", "")?;
-    let value = if ["TRON", "POLKADOT", "KUSAMA"].contains(&param.chain_type.as_str()) {
+    let value = if ["TRON", "POLKADOT", "KUSAMA", "DEEPER"].contains(&param.chain_type.as_str()) {
         Ok(pk_hex.to_string())
     } else if "FILECOIN".contains(&param.chain_type.as_str()) {
         if let Some(account) = guard
@@ -644,7 +642,7 @@ pub(crate) fn sign_tx(data: &[u8]) -> Result<Vec<u8>> {
         "BITCOINCASH" | "LITECOIN" => sign_btc_fork_transaction(&param, guard.keystore_mut()),
         "TRON" => sign_tron_tx(&param, guard.keystore_mut()),
         "NERVOS" => sign_nervos_ckb(&param, guard.keystore_mut()),
-        "POLKADOT" | "KUSAMA" => sign_substrate_tx_raw(&param, guard.keystore_mut()),
+        "POLKADOT" | "KUSAMA" | "DEEPER" => sign_substrate_tx_raw(&param, guard.keystore_mut()),
         "FILECOIN" => sign_filecoin_tx(&param, guard.keystore_mut()),
         "TEZOS" => sign_tezos_tx_raw(&param, guard.keystore_mut()),
         _ => Err(format_err!("unsupported_chain")),

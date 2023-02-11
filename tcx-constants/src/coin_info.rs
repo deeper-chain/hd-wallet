@@ -125,6 +125,13 @@ lazy_static! {
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
+            coin: "DEEPER".to_string(),
+            derivation_path: "".to_string(),
+            curve: CurveType::SubSr25519,
+            network: "".to_string(),
+            seg_wit: "".to_string(),
+        });
+        coin_infos.push(CoinInfo {
             coin: "TEZOS".to_string(),
             derivation_path: "m/44'/1729'/0'/0'".to_string(),
             curve: CurveType::ED25519,
