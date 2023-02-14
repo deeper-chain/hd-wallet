@@ -1,5 +1,1 @@
-
-
-pub fn func(args: Vec<String>) {
-
-}
+pub fn func(args: Vec<String>) {}

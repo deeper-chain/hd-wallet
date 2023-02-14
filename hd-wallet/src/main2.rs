@@ -7,7 +7,7 @@ use tcx::api::{
     KeystoreCommonExportResult, PrivateKeyStoreImportParam, PublicKeyParam, PublicKeyResult,
     Response, SignParam, WalletKeyParam, WalletResult,
 };
-use tcx::{call_api, error_handling::Result, get_last_err_message};
+use tcx::{call_api, error_handling::Result, get_last_err_message, handler};
 use tcx_substrate::{self, SubstrateRawTxIn, SubstrateTxOut};
 
 use tcx_tezos::address::TezosAddress;
@@ -78,7 +78,34 @@ pub fn func(args: Vec<String>) {
         "tx_input" => tx_input(args[2..].to_vec()),
 
         "tx_output" => tx_output(args[2].clone(), args[3].clone()),
+        "common_sign_message" => {
+            scan_keystores();
+            common_sign_message(&args[2], &args[3], &args[4], &args[5], &args[6], &args[7]);
+        }
         _ => {}
+    }
+}
+
+fn common_sign_message(
+    id: &str,
+    password: &str,
+    symbol: &str,
+    address: &str,
+    path: &str,
+    data: &str,
+) {
+    let path = if path.is_empty() { None } else { Some(path) };
+    let data = hex::decode(data).expect("sign output not correct");
+    let sign_res =
+        handler::common_sign_message(id, password, symbol, address, path, data.as_slice());
+    match sign_res {
+        Ok(sign_res) => {
+            let ret_str = hex::encode(sign_res);
+            println!("common_sign_message result {:?}", ret_str);
+        }
+        Err(e) => {
+            println!("common_sign_message err {:?}", e);
+        }
     }
 }
 

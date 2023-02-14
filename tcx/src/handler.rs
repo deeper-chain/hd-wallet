@@ -12,7 +12,9 @@ use tcx_btc_fork::{
     BtcForkAddress, BtcForkSegWitTransaction, BtcForkSignedTxOutput, BtcForkTransaction,
     BtcForkTxInput, WifDisplay,
 };
-use tcx_chain::{key_hash_from_mnemonic, key_hash_from_private_key, Keystore, KeystoreGuard};
+use tcx_chain::{
+    key_hash_from_mnemonic, key_hash_from_private_key, ChainSigner, Keystore, KeystoreGuard,
+};
 use tcx_chain::{Account, HdKeystore, Metadata, PrivateKeystore, Source};
 use tcx_ckb::{CkbAddress, CkbTxInput};
 use tcx_crypto::{XPUB_COMMON_IV, XPUB_COMMON_KEY_128};
@@ -770,6 +772,24 @@ pub(crate) fn sign_tron_tx(param: &SignParam, keystore: &mut Keystore) -> Result
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
 
     encode_message(signed_tx)
+}
+
+pub fn common_sign_message(
+    id: &str,
+    password: &str,
+    symbol: &str,
+    address: &str,
+    path: Option<&str>,
+    data: &[u8],
+) -> Result<Vec<u8>> {
+    let mut map = KEYSTORE_MAP.write();
+    let keystore: &mut Keystore = match map.get_mut(&id.to_string()) {
+        Some(keystore) => Ok(keystore),
+        _ => Err(format_err!("{}", "wallet_not_found")),
+    }?;
+
+    let mut guard = KeystoreGuard::unlock_by_password(keystore, password)?;
+    guard.keystore_mut().sign_hash(data, symbol, address, path)
 }
 
 pub(crate) fn tron_sign_message(data: &[u8]) -> Result<Vec<u8>> {
