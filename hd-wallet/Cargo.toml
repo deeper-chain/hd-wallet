@@ -28,7 +28,14 @@ bitcoin = "0.25.1"
 secp256k1 = {version ="0.19.0", features = ["rand", "recovery"] }
 tiny-bip39 = "0.6.0"
 bitcoin_hashes = "0.9.3"
-#bitcoinconsensus = { version = "0.19.0-2", optional = true }
 failure = "0.1.5"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.39"
+
+[[example]]
+name = "hd_store_import"
+path = "./example/hd_store_import.rs"
+
+[[example]]
+name = "export_mnemonic"
+path = "./example/export_mnemonic.rs"

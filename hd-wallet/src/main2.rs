@@ -57,6 +57,9 @@ pub fn func(args: Vec<String>) {
         "keystore_common_exists" => {
             keystore_common_exists(args[2].clone(), args[3].clone(), args[4].clone())
         }
+        "keystore_common_delete" => {
+            keystore_common_delete(args[2].clone(), args[3].clone());
+        }
         "keystore_common_accounts" => {
             scan_keystores();
             keystore_common_accounts(args[2].clone());
@@ -240,10 +243,7 @@ fn keystore_common_exists(key_type: String, value: String, encoding: String) {
 }
 
 fn keystore_common_delete(id: String, password: String) {
-    let param: WalletKeyParam = WalletKeyParam {
-        id,
-        password: "WRONG PASSWORD".to_string(),
-    };
+    let param: WalletKeyParam = WalletKeyParam { id, password };
 
     let ret = call_api("keystore_common_delete", param);
     if let Ok(ret_bytes) = ret {

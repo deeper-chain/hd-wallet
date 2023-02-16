@@ -55,7 +55,7 @@ use tcx_tezos::transaction::TezosRawTxIn;
 use tcx_tezos::{build_tezos_base58_private_key, pars_tezos_private_key};
 use tcx_tron::transaction::{TronMessageInput, TronTxInput};
 
-pub(crate) fn encode_message(msg: impl Message) -> Result<Vec<u8>> {
+pub fn encode_message(msg: impl Message) -> Result<Vec<u8>> {
     if *IS_DEBUG.read() {
         println!("{:#?}", msg);
     }
@@ -107,7 +107,7 @@ pub fn init_token_core_x(data: &[u8]) -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn scan_keystores() -> Result<()> {
+pub fn scan_keystores() -> Result<()> {
     clean_keystore();
     let file_dir = WALLET_FILE_DIR.read();
     let p = Path::new(file_dir.as_str());
@@ -142,7 +142,7 @@ pub(crate) fn scan_keystores() -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn hd_store_create(data: &[u8]) -> Result<Vec<u8>> {
+pub fn hd_store_create(data: &[u8]) -> Result<Vec<u8>> {
     let param: HdStoreCreateParam =
         HdStoreCreateParam::decode(data).expect("import wallet from mnemonic");
 
@@ -169,7 +169,7 @@ pub(crate) fn hd_store_create(data: &[u8]) -> Result<Vec<u8>> {
     Ok(ret)
 }
 
-pub(crate) fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
+pub fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
     let param: HdStoreImportParam =
         HdStoreImportParam::decode(data).expect("import wallet from mnemonic");
 
@@ -225,7 +225,7 @@ pub(crate) fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
     note = "Please use the export_mnemonic function instead"
 )]
 #[allow(deprecated)]
-pub(crate) fn hd_store_export(data: &[u8]) -> Result<Vec<u8>> {
+pub fn hd_store_export(data: &[u8]) -> Result<Vec<u8>> {
     let param: WalletKeyParam = WalletKeyParam::decode(data).expect("hd_store_export");
     let mut map = KEYSTORE_MAP.write();
     let keystore: &mut Keystore = match map.get_mut(&param.id) {
@@ -261,7 +261,7 @@ fn enc_xpub(xpub: &str, network: &str) -> Result<String> {
     Ok(base64::encode(&encrypted))
 }
 
-pub(crate) fn keystore_common_derive(data: &[u8]) -> Result<Vec<u8>> {
+pub fn keystore_common_derive(data: &[u8]) -> Result<Vec<u8>> {
     let param: KeystoreCommonDeriveParam =
         KeystoreCommonDeriveParam::decode(data).expect("keystore_common_derive");
     let mut map = KEYSTORE_MAP.write();
@@ -297,7 +297,7 @@ pub(crate) fn keystore_common_derive(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(accounts_rsp)
 }
 
-pub(crate) fn export_mnemonic(data: &[u8]) -> Result<Vec<u8>> {
+pub fn export_mnemonic(data: &[u8]) -> Result<Vec<u8>> {
     let param: WalletKeyParam = WalletKeyParam::decode(data).expect("export_mnemonic");
     let mut map = KEYSTORE_MAP.write();
     let keystore: &mut Keystore = match map.get_mut(&param.id) {
@@ -346,7 +346,7 @@ fn key_hash_from_tezos_format_pk(pk: &str) -> Result<String> {
     Ok(key_hash_from_private_key(&key_data))
 }
 
-pub(crate) fn private_key_store_import(data: &[u8]) -> Result<Vec<u8>> {
+pub fn private_key_store_import(data: &[u8]) -> Result<Vec<u8>> {
     let param: PrivateKeyStoreImportParam =
         PrivateKeyStoreImportParam::decode(data).expect("private_key_store_import");
 
@@ -412,7 +412,7 @@ pub(crate) fn private_key_store_import(data: &[u8]) -> Result<Vec<u8>> {
     since = "2.5.1",
     note = "Please use the export_private_key function instead"
 )]
-pub(crate) fn private_key_store_export(data: &[u8]) -> Result<Vec<u8>> {
+pub fn private_key_store_export(data: &[u8]) -> Result<Vec<u8>> {
     let param: PrivateKeyStoreExportParam =
         PrivateKeyStoreExportParam::decode(data).expect("private_key_store_export");
     let mut map = KEYSTORE_MAP.write();
@@ -446,7 +446,7 @@ pub(crate) fn private_key_store_export(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(export_result)
 }
 
-pub(crate) fn export_private_key(data: &[u8]) -> Result<Vec<u8>> {
+pub fn export_private_key(data: &[u8]) -> Result<Vec<u8>> {
     let param: ExportPrivateKeyParam =
         ExportPrivateKeyParam::decode(data).expect("export_private_key");
     let mut map = KEYSTORE_MAP.write();
@@ -515,7 +515,7 @@ pub(crate) fn export_private_key(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(export_result)
 }
 
-pub(crate) fn keystore_common_verify(data: &[u8]) -> Result<Vec<u8>> {
+pub fn keystore_common_verify(data: &[u8]) -> Result<Vec<u8>> {
     let param: WalletKeyParam = WalletKeyParam::decode(data).expect("keystore_common_delete");
     let map = KEYSTORE_MAP.read();
     let keystore: &Keystore = match map.get(&param.id) {
@@ -534,7 +534,7 @@ pub(crate) fn keystore_common_verify(data: &[u8]) -> Result<Vec<u8>> {
     }
 }
 
-pub(crate) fn keystore_common_delete(data: &[u8]) -> Result<Vec<u8>> {
+pub fn keystore_common_delete(data: &[u8]) -> Result<Vec<u8>> {
     let param: WalletKeyParam = WalletKeyParam::decode(data).expect("keystore_common_delete");
     let mut map = KEYSTORE_MAP.write();
     let keystore: &Keystore = match map.get(&param.id) {
@@ -556,7 +556,7 @@ pub(crate) fn keystore_common_delete(data: &[u8]) -> Result<Vec<u8>> {
     }
 }
 
-pub(crate) fn keystore_common_exists(data: &[u8]) -> Result<Vec<u8>> {
+pub fn keystore_common_exists(data: &[u8]) -> Result<Vec<u8>> {
     let param: KeystoreCommonExistsParam =
         KeystoreCommonExistsParam::decode(data).expect("keystore_common_exists params");
     let key_hash: String;
@@ -594,7 +594,7 @@ pub(crate) fn keystore_common_exists(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(result)
 }
 
-pub(crate) fn keystore_common_accounts(data: &[u8]) -> Result<Vec<u8>> {
+pub fn keystore_common_accounts(data: &[u8]) -> Result<Vec<u8>> {
     let param: KeystoreCommonAccountsParam =
         KeystoreCommonAccountsParam::decode(data).expect("keystore_common_accounts params");
     let map = KEYSTORE_MAP.read();
@@ -624,7 +624,7 @@ pub(crate) fn keystore_common_accounts(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(accounts_rsp)
 }
 
-pub(crate) fn sign_tx(data: &[u8]) -> Result<Vec<u8>> {
+pub fn sign_tx(data: &[u8]) -> Result<Vec<u8>> {
     let param: SignParam = SignParam::decode(data).expect("SignTxParam");
 
     let mut map = KEYSTORE_MAP.write();
@@ -651,7 +651,7 @@ pub(crate) fn sign_tx(data: &[u8]) -> Result<Vec<u8>> {
     }
 }
 
-pub(crate) fn get_public_key(data: &[u8]) -> Result<Vec<u8>> {
+pub fn get_public_key(data: &[u8]) -> Result<Vec<u8>> {
     let param: PublicKeyParam = PublicKeyParam::decode(data).expect("PublicKeyParam");
 
     let mut map = KEYSTORE_MAP.write();
@@ -689,7 +689,7 @@ pub(crate) fn get_public_key(data: &[u8]) -> Result<Vec<u8>> {
     }
 }
 
-pub(crate) fn sign_filecoin_tx(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
+pub fn sign_filecoin_tx(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
     let input: UnsignedMessage = UnsignedMessage::decode(
         param
             .input
@@ -705,10 +705,7 @@ pub(crate) fn sign_filecoin_tx(param: &SignParam, keystore: &mut Keystore) -> Re
     encode_message(signed_tx)
 }
 
-pub(crate) fn sign_btc_fork_transaction(
-    param: &SignParam,
-    keystore: &mut Keystore,
-) -> Result<Vec<u8>> {
+pub fn sign_btc_fork_transaction(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
     let input: BtcForkTxInput = BtcForkTxInput::decode(
         param
             .input
@@ -743,7 +740,7 @@ pub(crate) fn sign_btc_fork_transaction(
     encode_message(signed_tx)
 }
 
-pub(crate) fn sign_nervos_ckb(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
+pub fn sign_nervos_ckb(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
     let input: CkbTxInput = CkbTxInput::decode(
         param
             .input
@@ -758,7 +755,7 @@ pub(crate) fn sign_nervos_ckb(param: &SignParam, keystore: &mut Keystore) -> Res
     encode_message(signed_tx)
 }
 
-pub(crate) fn sign_tron_tx(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
+pub fn sign_tron_tx(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
     let input: TronTxInput = TronTxInput::decode(
         param
             .input
@@ -792,7 +789,7 @@ pub fn common_sign_message(
     guard.keystore_mut().sign_hash(data, symbol, address, path)
 }
 
-pub(crate) fn tron_sign_message(data: &[u8]) -> Result<Vec<u8>> {
+pub fn tron_sign_message(data: &[u8]) -> Result<Vec<u8>> {
     let param: SignParam = SignParam::decode(data).expect("SignParam");
 
     let mut map = KEYSTORE_MAP.write();
@@ -823,7 +820,7 @@ pub(crate) fn tron_sign_message(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(signed_tx)
 }
 
-pub(crate) fn get_derived_key(data: &[u8]) -> Result<Vec<u8>> {
+pub fn get_derived_key(data: &[u8]) -> Result<Vec<u8>> {
     let param: WalletKeyParam = WalletKeyParam::decode(data).unwrap();
     let mut map = KEYSTORE_MAP.write();
     let keystore: &mut Keystore = match map.get_mut(&param.id) {
@@ -840,7 +837,7 @@ pub(crate) fn get_derived_key(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(ret)
 }
 
-pub(crate) fn sign_substrate_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
+pub fn sign_substrate_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
     let input: SubstrateRawTxIn = SubstrateRawTxIn::decode(
         param
             .input
@@ -855,7 +852,7 @@ pub(crate) fn sign_substrate_tx_raw(param: &SignParam, keystore: &mut Keystore) 
     encode_message(signed_tx)
 }
 
-pub(crate) fn import_substrate_keystore(data: &[u8]) -> Result<Vec<u8>> {
+pub fn import_substrate_keystore(data: &[u8]) -> Result<Vec<u8>> {
     let param: SubstrateKeystoreParam = SubstrateKeystoreParam::decode(data)?;
     let ks: SubstrateKeystore = serde_json::from_str(&param.keystore)?;
     let _ = ks.validate()?;
@@ -872,7 +869,7 @@ pub(crate) fn import_substrate_keystore(data: &[u8]) -> Result<Vec<u8>> {
     private_key_store_import(&param_bytes)
 }
 
-pub(crate) fn export_substrate_keystore(data: &[u8]) -> Result<Vec<u8>> {
+pub fn export_substrate_keystore(data: &[u8]) -> Result<Vec<u8>> {
     let param: ExportPrivateKeyParam = ExportPrivateKeyParam::decode(data.clone())?;
     let meta: Metadata;
     {
@@ -909,7 +906,7 @@ pub(crate) fn export_substrate_keystore(data: &[u8]) -> Result<Vec<u8>> {
     encode_message(ret)
 }
 
-pub(crate) fn substrate_keystore_exists(data: &[u8]) -> Result<Vec<u8>> {
+pub fn substrate_keystore_exists(data: &[u8]) -> Result<Vec<u8>> {
     let param: SubstrateKeystoreParam = SubstrateKeystoreParam::decode(data)?;
     let ks: SubstrateKeystore = serde_json::from_str(&param.keystore)?;
     let _ = ks.validate()?;
@@ -925,7 +922,7 @@ pub(crate) fn substrate_keystore_exists(data: &[u8]) -> Result<Vec<u8>> {
     keystore_common_exists(&exists_param_bytes)
 }
 
-pub(crate) fn unlock_then_crash(data: &[u8]) -> Result<Vec<u8>> {
+pub fn unlock_then_crash(data: &[u8]) -> Result<Vec<u8>> {
     let param: WalletKeyParam = WalletKeyParam::decode(data).unwrap();
     let mut map = KEYSTORE_MAP.write();
     let keystore: &mut Keystore = match map.get_mut(&param.id) {
@@ -937,7 +934,7 @@ pub(crate) fn unlock_then_crash(data: &[u8]) -> Result<Vec<u8>> {
     panic!("test_unlock_then_crash");
 }
 
-pub(crate) fn sign_tezos_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
+pub fn sign_tezos_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
     let input: TezosRawTxIn = TezosRawTxIn::decode(
         param
             .input
