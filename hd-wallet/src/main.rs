@@ -1,22 +1,13 @@
 use bytes::BytesMut;
+use failure::format_err;
 use prost::Message;
 use std::env;
 use std::ffi::CString;
+use std::io::{Read, Write};
+use std::net::{TcpListener, TcpStream};
 use std::os::raw::c_char;
-//use tcx::api::InitTokenCoreXParam;
-use tcx::api::{
-    keystore_common_derive_param::Derivation, AccountsResponse, HdStoreImportParam,
-    KeystoreCommonAccountsParam, KeystoreCommonDeriveParam, KeystoreCommonExportResult,
-    PublicKeyParam, PublicKeyResult, SignParam, WalletKeyParam, WalletResult,
-};
-use tcx::{call_api, get_last_err_message};
-//use tcx_constants;
-use tcx_bch;
-use tcx_primitive;
-use tcx_substrate::{self, SubstrateRawTxIn, SubstrateTxOut};
-// use tcx_tron;
-// use tcx_tezos;
-// use tcx_filecoin;
+use tcx::api::{Response, TcxAction};
+use tcx::handler;
 mod main2;
 mod main3;
 
@@ -30,136 +21,95 @@ fn _to_c_char(str: &str) -> *const c_char {
     CString::new(str).unwrap().into_raw()
 }
 
+fn handle_client(mut stream: TcpStream) {
+    let mut buf = Vec::with_capacity(1000);
+    let _ = stream.read_to_end(&mut buf);
+    println!("recv buf {:?}", buf.len());
+    let action: TcxAction = TcxAction::decode(buf.as_slice()).expect("decode tcx api");
+    println!("recv action {:?}", action);
+    let res = match action.method.to_lowercase().as_str() {
+        "init_token_core_x" => {
+            handler::init_token_core_x(&action.param.unwrap().value).map(|_| vec![])
+        }
+        "scan_keystores" => handler::scan_keystores().map(|_| vec![]),
+        "hd_store_create" => handler::hd_store_create(&action.param.unwrap().value).map(|_| vec![]),
+        "hd_store_import" => handler::hd_store_import(&action.param.unwrap().value),
+        "hd_store_export" => handler::hd_store_export(&action.param.unwrap().value).map(|_| vec![]),
+        "export_mnemonic" => handler::export_mnemonic(&action.param.unwrap().value),
+        "keystore_common_derive" => handler::keystore_common_derive(&action.param.unwrap().value),
+
+        "private_key_store_import" => {
+            handler::private_key_store_import(&action.param.unwrap().value)
+        }
+        "private_key_store_export" => {
+            handler::private_key_store_export(&action.param.unwrap().value)
+        }
+        "export_private_key" => handler::export_private_key(&action.param.unwrap().value),
+        "keystore_common_verify" => handler::keystore_common_verify(&action.param.unwrap().value),
+        "keystore_common_delete" => handler::keystore_common_delete(&action.param.unwrap().value),
+        "keystore_common_exists" => handler::keystore_common_exists(&action.param.unwrap().value),
+        "keystore_common_accounts" => {
+            handler::keystore_common_accounts(&action.param.unwrap().value)
+        }
+
+        "sign_tx" => handler::sign_tx(&action.param.unwrap().value),
+        "get_public_key" => handler::get_public_key(&action.param.unwrap().value),
+
+        "tron_sign_msg" => handler::tron_sign_message(&action.param.unwrap().value),
+
+        "substrate_keystore_exists" => {
+            handler::substrate_keystore_exists(&action.param.unwrap().value)
+        }
+
+        "substrate_keystore_import" => {
+            handler::import_substrate_keystore(&action.param.unwrap().value)
+        }
+
+        "substrate_keystore_export" => {
+            handler::export_substrate_keystore(&action.param.unwrap().value)
+        }
+
+        // !!! WARNING !!! used for `cache_dk` feature
+        "get_derived_key" => handler::get_derived_key(&action.param.unwrap().value),
+        // !!! WARNING !!! used for test only
+        "unlock_then_crash" => handler::unlock_then_crash(&action.param.unwrap().value),
+        _ => Err(format_err!("unsupported_method")),
+    };
+
+    let send_buf = match res {
+        Ok(res) => {
+            if res.is_empty() {
+                let response = Response {
+                    is_success: false,
+                    error: "Ok".to_string(),
+                };
+                encode_message(response)
+            } else {
+                res
+            }
+        }
+        Err(e) => {
+            let response = Response {
+                is_success: false,
+                error: format!("{:?}", e),
+            };
+            encode_message(response)
+        }
+    };
+
+    println!("stream send res {:?}", stream.write_all(&send_buf));
+    let _ = stream.shutdown(std::net::Shutdown::Write);
+}
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let _args: Vec<String> = env::args().collect();
+    let _ = handler::scan_keystores();
+    let listener = TcpListener::bind("127.0.0.1:9999").unwrap();
 
-    main2::func(args.clone());
-    main3::func(args);
-    // match args[1].as_str() {
-    //     "generate" => println!("mnemonic: \"{}\"", tcx_primitive::generate_mnemonic()),
+    for stream in listener.incoming() {
+        std::thread::spawn(|| handle_client(stream.unwrap()));
+    }
 
-    //     //————————————Substrate———————————//
-    //     "substrate_pk_from_seed" => println!(
-    //         "public key from seed: {}",
-    //         tcx_primitive::recover_pk_from_seed(&args[2])
-    //     ),
-    //     "substrate_pk_from_mnemonic" => println!(
-    //         "public key from mnemonic: {}",
-    //         tcx_primitive::recover_pk_from_mnemonic(&args[2])
-    //     ),
-    //     "substrate_sk_drive_from_mnemonic" => println!(
-    //         "private key from mnemonic: {}",
-    //         tcx_primitive::recover_sk_drive_from_mnemoic(&args[2], &args[3])
-    //     ),
-    //     "substrate_ss58" => println!(
-    //         "ss58 address from mnemonic: {}",
-    //         tcx_primitive::recover_address_from_mnemonic(&args[2])
-    //     ),
-    //     "substrate_pk_drive_from_mnemonic" => println!(
-    //         "public key from mnemonic: {}",
-    //         tcx_primitive::recover_pk_drive_from_mnemoic(&args[2], &args[3])
-    //     ),
-    //     "export_from_secret_key" => println!(
-    //         "export_from_secret_key: {:?}",
-    //         tcx_substrate::export_from_secret_key()
-    //     ),
-
-    //     //————————————BCH———————————//
-    //     "bip39_mnemonic_convert_seed" => println!(
-    //         "bip39 mnemonic convert seed: {:?} ",
-    //         tcx_primitive::mnemonic_convert_seed(&args[2])
-    //     ),
-    //     "bch_address_from_pub_key" => println!(
-    //         "bch_address from pub key: {}",
-    //         tcx_bch::bch_address_from_pub_key(&args[2])
-    //     ),
-    //     "bch_address_from_pri_key" => println!(
-    //         "bch_address from pri key: {}",
-    //         tcx_bch::bch_address_from_pri_key(&args[2])
-    //     ),
-    //     "bch_sign_tx" => println!(
-    //         "bch sign transaction: {}",
-    //         tcx_bch::bch_sign_to_tx(&args[2], args[3].parse::<i64>().unwrap(), &args[4])
-    //     ),
-    //     "bch_account_create" => {
-    //         println!("keystore info: {}", tcx_bch::bch_account_create(&args[2]))
-    //     }
-    //     "bch_account_recover" => println!(
-    //         "keystore info: {}",
-    //         tcx_bch::bch_account_recover(&args[2], &args[3])
-    //     ),
-    // }
-}
-
-fn hd_import(mnemonic: &str, password: &str) {
-    let import_param = HdStoreImportParam {
-        mnemonic: mnemonic.to_string(),
-        password: password.to_string(),
-        source: "MNEMONIC".to_string(),
-        name: "call_tcx_api".to_string(),
-        password_hint: "deeper".to_string(),
-        overwrite: true,
-    };
-    let ret_bytes = call_api("hd_store_import", import_param).unwrap();
-    let ret: WalletResult = WalletResult::decode(ret_bytes.as_slice()).unwrap();
-    println!("ret {:?}", ret);
-}
-
-fn hd_working(json: &str, password: &str) {
-    let empty = WalletKeyParam {
-        id: "".to_string(),
-        password: password.to_string(),
-    };
-    let _ = call_api("scan_keystores", empty);
-
-    let param = WalletKeyParam {
-        id: json.to_string(),
-        password: password.to_string(),
-    };
-    let ret = call_api("export_mnemonic", param).unwrap();
-    let result: KeystoreCommonExportResult =
-        KeystoreCommonExportResult::decode(ret.as_slice()).unwrap();
-
-    println!("KeystoreCommonExportResult {:?}", result);
-
-    let derivations = vec![Derivation {
-        chain_type: "KUSAMA".to_string(),
-        path: "".to_string(),
-        network: "".to_string(),
-        seg_wit: "".to_string(),
-        chain_id: "".to_string(),
-        curve: "".to_string(),
-    }];
-    let param = KeystoreCommonDeriveParam {
-        id: json.to_string(),
-        password: password.to_string(),
-        derivations,
-    };
-
-    let derived_accounts_bytes = call_api("keystore_common_derive", param).unwrap();
-    let derived_accounts: AccountsResponse =
-        AccountsResponse::decode(derived_accounts_bytes.as_slice()).unwrap();
-    println!("derived_accounts {:?}", derived_accounts);
-
-    let unsigned_msg = "0x0123456789";
-    let input = SubstrateRawTxIn {
-        raw_data: unsigned_msg.to_string(),
-    };
-
-    let input_value = encode_message(input);
-    let tx = SignParam {
-        id: json.to_string(),
-        key: Some(tcx::api::sign_param::Key::Password(password.to_string())),
-        chain_type: "KUSAMA".to_string(),
-        address: derived_accounts.accounts.first().unwrap().address.clone(),
-        input: Some(::prost_types::Any {
-            type_url: "deeper".to_string(),
-            value: input_value.clone(),
-        }),
-    };
-
-    let ret = call_api("sign_tx", tx).unwrap();
-    let output: SubstrateTxOut = SubstrateTxOut::decode(ret.as_slice()).unwrap();
-
-    println!("SubstrateTxOut {:?}", output);
+    // main2::func(args.clone());
+    // main3::func(args);
 }

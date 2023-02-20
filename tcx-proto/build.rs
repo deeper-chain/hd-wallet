@@ -45,4 +45,8 @@ fn main() {
     //tcx-tezos
     env::set_var("OUT_DIR", "../tcx-tezos/src");
     prost_build::compile_protos(&["src/tezos.proto"], &["src/"]).unwrap();
+
+    // tcx-eth
+    env::set_var("OUT_DIR", "../tcx-eth/src");
+    prost_build::compile_protos(&["src/eth.proto"], &["src/"]).unwrap();
 }

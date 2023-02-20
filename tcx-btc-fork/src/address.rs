@@ -54,6 +54,7 @@ impl Address for BtcForkAddress {
         } else {
             BtcForkAddress::p2pkh(&public_key.to_bytes(), &network)?.to_string()
         };
+        println!("BtcForkAddress from_public_key {:?}", addr);
         Ok(addr.to_string())
     }
 

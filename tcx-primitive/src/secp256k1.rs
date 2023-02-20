@@ -1,7 +1,7 @@
 use crate::constant::SECP256K1_ENGINE;
 use crate::ecc::{KeyError, PrivateKey as TraitPrivateKey, PublicKey as TraitPublicKey};
-
 use bitcoin::Network;
+use secp256k1::recovery::{RecoverableSignature, RecoveryId};
 
 use bitcoin::util::key::{PrivateKey, PublicKey};
 
@@ -91,6 +91,18 @@ impl TraitPrivateKey for Secp256k1PrivateKey {
 
     fn to_bytes(&self) -> Vec<u8> {
         self.0.to_bytes()
+    }
+
+    fn recover(data: &[u8], sig: &[u8]) -> Result<Vec<u8>> {
+        let msg = Message::from_slice(data).map_err(transform_secp256k1_error)?;
+        if sig.len() != 65 {
+            return Err(format_err!("invalid sig to recover"));
+        }
+        let recover_id = RecoveryId::from_i32(sig[64] as i32)?;
+        let recover_sig = RecoverableSignature::from_compact(&sig[0..64], recover_id)?;
+
+        let pub_key: secp256k1::PublicKey = SECP256K1_ENGINE.recover(&msg, &recover_sig)?;
+        return Ok(pub_key.serialize_uncompressed().to_vec());
     }
 }
 

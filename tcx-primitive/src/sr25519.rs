@@ -53,6 +53,9 @@ impl TraitPrivateKey for Sr25519PrivateKey {
     fn to_bytes(&self) -> Vec<u8> {
         self.0.to_raw_vec()
     }
+    fn recover(data: &[u8], sig: &[u8]) -> Result<Vec<u8>> {
+        unimplemented!()
+    }
 }
 
 impl std::fmt::Display for Sr25519PublicKey {

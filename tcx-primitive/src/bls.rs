@@ -42,6 +42,10 @@ impl TraitPrivateKey for BLSPrivateKey {
     fn to_bytes(&self) -> Vec<u8> {
         self.0.as_bytes()
     }
+
+    fn recover(data: &[u8], sig: &[u8]) -> Result<Vec<u8>> {
+        unimplemented!()
+    }
 }
 
 impl TraitPublicKey for BLSPublicKey {

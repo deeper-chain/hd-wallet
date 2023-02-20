@@ -2715,6 +2715,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rlp"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1190dcc8c3a512f1eef5d09bb8c84c7f39e1054e174d1795482e18f5272f2e73"
+dependencies = [
+ "rustc-hex",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3589,6 +3598,27 @@ dependencies = [
  "serde_json",
  "sha2 0.8.2",
  "tcx-constants",
+ "tiny-keccak 1.5.0",
+]
+
+[[package]]
+name = "tcx-eth"
+version = "0.1.0"
+dependencies = [
+ "byteorder 1.3.4",
+ "bytes 0.4.12",
+ "failure",
+ "hex 0.3.2",
+ "libsecp256k1",
+ "num-bigint 0.2.6",
+ "prost 0.5.0",
+ "prost-types 0.5.0",
+ "regex",
+ "rlp",
+ "tcx-chain",
+ "tcx-constants",
+ "tcx-crypto",
+ "tcx-primitive",
  "tiny-keccak 1.5.0",
 ]
 
