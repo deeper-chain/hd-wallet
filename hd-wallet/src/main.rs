@@ -104,12 +104,12 @@ fn handle_client(mut stream: TcpStream) {
 fn main() {
     let _args: Vec<String> = env::args().collect();
     let _ = handler::scan_keystores();
-    let listener = TcpListener::bind("127.0.0.1:9999").unwrap();
+    // let listener = TcpListener::bind("127.0.0.1:9999").unwrap();
 
-    for stream in listener.incoming() {
-        std::thread::spawn(|| handle_client(stream.unwrap()));
-    }
+    // for stream in listener.incoming() {
+    //     std::thread::spawn(|| handle_client(stream.unwrap()));
+    // }
 
-    // main2::func(args.clone());
+    main2::func(_args.clone());
     // main3::func(args);
 }

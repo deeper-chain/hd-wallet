@@ -18,6 +18,7 @@ use tcx_chain::{
 use tcx_chain::{Account, HdKeystore, Metadata, PrivateKeystore, Source};
 use tcx_ckb::{CkbAddress, CkbTxInput};
 use tcx_crypto::{XPUB_COMMON_IV, XPUB_COMMON_KEY_128};
+use tcx_ethereum::{EthereumAddress, EthereumTxIn};
 use tcx_filecoin::{FilecoinAddress, KeyInfo, UnsignedMessage};
 use tcx_tron::TrxAddress;
 
@@ -72,7 +73,6 @@ fn derive_account<'a, 'b>(keystore: &mut Keystore, derivation: &Derivation) -> R
         &derivation.curve,
     )?;
     coin_info.derivation_path = derivation.path.to_owned();
-
     match derivation.chain_type.as_str() {
         "BITCOINCASH" => keystore.derive_coin::<BchAddress>(&coin_info),
         "LITECOIN" => keystore.derive_coin::<BtcForkAddress>(&coin_info),
@@ -81,6 +81,7 @@ fn derive_account<'a, 'b>(keystore: &mut Keystore, derivation: &Derivation) -> R
         "POLKADOT" | "KUSAMA" | "DEEPER" => keystore.derive_coin::<SubstrateAddress>(&coin_info),
         "TEZOS" => keystore.derive_coin::<TezosAddress>(&coin_info),
         "FILECOIN" => keystore.derive_coin::<FilecoinAddress>(&coin_info),
+        "ETHEREUM" => keystore.derive_coin::<EthereumAddress>(&coin_info),
         _ => Err(format_err!("unsupported_chain")),
     }
 }
@@ -173,7 +174,6 @@ pub fn hd_store_import(data: &[u8]) -> Result<Vec<u8>> {
     let param: HdStoreImportParam =
         HdStoreImportParam::decode(data).expect("import wallet from mnemonic");
 
-    println!("hd_store_import");
     let mut founded_id: Option<String> = None;
     {
         let key_hash = key_hash_from_mnemonic(&param.mnemonic)?;
@@ -271,9 +271,7 @@ pub fn keystore_common_derive(data: &[u8]) -> Result<Vec<u8>> {
     }?;
 
     let mut guard = KeystoreGuard::unlock_by_password(keystore, &param.password)?;
-
     let mut account_responses: Vec<AccountResponse> = vec![];
-
     for derivation in param.derivations {
         let account = derive_account(guard.keystore_mut(), &derivation)?;
         let enc_xpub = if account.ext_pub_key.is_empty() {
@@ -482,7 +480,9 @@ pub fn export_private_key(data: &[u8]) -> Result<Vec<u8>> {
 
     // private_key prefix is only about chain type and network
     let coin_info = coin_info_from_param(&param.chain_type, &param.network, "", "")?;
-    let value = if ["TRON", "POLKADOT", "KUSAMA", "DEEPER"].contains(&param.chain_type.as_str()) {
+    let value = if ["TRON", "POLKADOT", "KUSAMA", "ETHEREUM", "DEEPER"]
+        .contains(&param.chain_type.as_str())
+    {
         Ok(pk_hex.to_string())
     } else if "FILECOIN".contains(&param.chain_type.as_str()) {
         if let Some(account) = guard
@@ -647,6 +647,7 @@ pub fn sign_tx(data: &[u8]) -> Result<Vec<u8>> {
         "POLKADOT" | "KUSAMA" | "DEEPER" => sign_substrate_tx_raw(&param, guard.keystore_mut()),
         "FILECOIN" => sign_filecoin_tx(&param, guard.keystore_mut()),
         "TEZOS" => sign_tezos_tx_raw(&param, guard.keystore_mut()),
+        "ETHEREUM" => sign_ethereum_tx_raw(&param, guard.keystore_mut()),
         _ => Err(format_err!("unsupported_chain")),
     }
 }
@@ -945,6 +946,21 @@ pub fn sign_tezos_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<V
             .as_slice(),
     )
     .expect("TezosRawTxIn");
+    let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
+    encode_message(signed_tx)
+}
+
+pub fn sign_ethereum_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<Vec<u8>> {
+    let input: EthereumTxIn = EthereumTxIn::decode(
+        param
+            .input
+            .as_ref()
+            .expect("raw_tx_input")
+            .value
+            .clone()
+            .as_slice(),
+    )
+    .expect("EthereumTxIn");
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message(signed_tx)
 }

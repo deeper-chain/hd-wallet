@@ -2804,4 +2804,121 @@ mod tests {
             remove_created_wallet(&wallet.id);
         })
     }
+
+    #[test]
+    pub fn test_sign_btc_tx() {
+        run_test(|| {
+            let chain_types = vec!["BITCOIN"];
+
+            let import_result: WalletResult = import_default_wallet();
+
+            for chain_type in chain_types {
+                let derivation = Derivation {
+                    chain_type: chain_type.to_string(),
+                    path: "m/44'/0'/0'/0/0".to_string(),
+                    network: "MAINNET".to_string(),
+                    seg_wit: "NONE".to_string(),
+                    chain_id: "".to_string(),
+                    curve: "".to_string(),
+                };
+                let param = KeystoreCommonDeriveParam {
+                    id: import_result.id.to_string(),
+                    password: TEST_PASSWORD.to_string(),
+                    derivations: vec![derivation],
+                };
+
+                let ret = call_api("keystore_common_derive", param).unwrap();
+                let rsp: AccountsResponse = AccountsResponse::decode(ret.as_slice()).unwrap();
+
+                let unspents = vec![Utxo {
+                    tx_hash: "a477af6b2667c29670467e4e0728b685ee07b240235771862318e29ddbe58458"
+                        .to_string(),
+                    vout: 0,
+                    amount: 1000000,
+                    address: "mszYqVnqKoQx4jcTdJXxwKAissE3Jbrrc1".to_string(),
+                    script_pub_key: "76a91488d9931ea73d60eaf7e5671efc0552b912911f2a88ac"
+                        .to_string(),
+                    derived_path: "0/0".to_string(),
+                    sequence: 0,
+                }];
+                let tx_input = BtcForkTxInput {
+                    to: rsp.accounts.first().unwrap().address.to_string(),
+                    amount: 500000,
+                    unspents,
+                    fee: 100000,
+                    change_address_index: 1u32,
+                    change_address: "".to_string(),
+                    network: "MAINNET".to_string(),
+                    seg_wit: "NONE".to_string(),
+                };
+                let input_value = encode_message(tx_input).unwrap();
+                let tx = SignParam {
+                    id: import_result.id.to_string(),
+                    key: Some(Key::Password(TEST_PASSWORD.to_string())),
+                    chain_type: chain_type.to_string(),
+                    address: rsp.accounts.first().unwrap().address.to_string(),
+                    input: Some(::prost_types::Any {
+                        type_url: "imtoken".to_string(),
+                        value: input_value.clone(),
+                    }),
+                };
+
+                let ret = call_api("sign_tx", tx);
+                let rsp: BtcForkSignedTxOutput =
+                    BtcForkSignedTxOutput::decode(ret.unwrap().as_slice()).unwrap();
+                assert_eq!(rsp.signature,
+                "01000000015884e5db9de218238671572340b207ee85b628074e7e467096c267266baf77a4000000006b483045022100b1f6443eed90df9f1c18a2bca4d641c963a6413f80d8941ca6bc9eecbaa72b99022046d80ae0652266299ada797f176289166b0599de1918817786931dede181a9230121026b5b6a9d041bc5187e0b34f9e496436c7bff261c6c1b5f3c06b433c61394b868ffffffff0220a10700000000001976a91415c4698fadd6a54dede98c2fbc62fb21b13b0d7788ac801a0600000000001976a914a6381e76634d662f9f66a1d0f43cc058102e98c588ac00000000"
+                );
+                assert_eq!(
+                    rsp.tx_hash,
+                    "737f9d57b8d1c6f7eb112e6b21fbdf1eaf286c43234d48a36716e8147cac0500"
+                );
+            }
+
+            remove_created_wallet(&import_result.id);
+        })
+    }
+
+    #[test]
+    pub fn test_sign_eth_tx() {
+        run_test(|| {
+            let derivation = Derivation {
+                chain_type: "ETHEREUM".to_string(),
+                path: "m/44'/60'/0'/0/0".to_string(),
+                network: "MAINNET".to_string(),
+                seg_wit: "".to_string(),
+                chain_id: "".to_string(),
+                curve: "".to_string(),
+            };
+
+            let wallet = import_and_derive(derivation);
+
+            let input = EthereumTxIn {
+                nonce: "0".to_string(),
+                to: "132D1eA7EF895b6834D25911656a434d7167091C".to_string(),
+                value: U256::zero().to_string(),
+                gas_price: "1000".to_string(),
+                gas: "21240".to_string(),
+                data: "7f7465737432000000000000000000000000000000000000000000000000000000600057"
+                    .to_string(),
+                network: "MAINNET".to_string(),
+            };
+
+            let tx = SignParam {
+                id: wallet.id.to_string(),
+                key: Some(Key::Password(TEST_PASSWORD.to_string())),
+                chain_type: "ETHEREUM".to_string(),
+                address: wallet.accounts.first().unwrap().address.to_string(),
+                input: Some(::prost_types::Any {
+                    type_url: "imtoken".to_string(),
+                    value: encode_message(input).unwrap(),
+                }),
+            };
+
+            let ret = call_api("sign_tx", tx).unwrap();
+            let output: EthereumTxOut = EthereumTxOut::decode(ret.as_slice()).unwrap();
+            assert_eq!(output.signature.as_str(), "f886808210008302124094132d1ea7ef895b6834d25911656a434d7167091c80a47f746573743200000000000000000000000000000000000000000000000000000060005725a07ca809897592f90ed7104a4984ae96ed67c8ce26f95ff7571084ca55e6af05b7a073e3a82301169d171a2590cdfd59075afd0e4ee20e5398ad32838f3061747b6b");
+            remove_created_wallet(&wallet.id);
+        })
+    }
 }

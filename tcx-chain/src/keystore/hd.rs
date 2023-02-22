@@ -178,12 +178,18 @@ impl HdKeystore {
     }
 
     pub(crate) fn derive_coin<A: Address>(&mut self, coin_info: &CoinInfo) -> Result<Account> {
+        println!("derive_coin public_key 11 ");
         let cache = self.cache.as_ref().ok_or(Error::KeystoreLocked)?;
+        println!("derive_coin public_key 22 ");
         let root = TypedDeterministicPrivateKey::from_mnemonic(coin_info.curve, &cache.mnemonic)?;
+        println!("derive_coin public_key 33 ");
         let private_key = root.derive(&coin_info.derivation_path)?.private_key();
+        println!("derive_coin public_key 44 ");
         let public_key = private_key.public_key();
 
+        println!("derive_coin public_key ");
         let address = A::from_public_key(&public_key, coin_info)?;
+        println!("derive_coin address {}", address);
         // todo: ext_pub_key
         let ext_pub_key = match coin_info.curve {
             CurveType::SubSr25519 | CurveType::BLS | CurveType::ED25519 => "".to_owned(),

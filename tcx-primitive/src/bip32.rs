@@ -58,11 +58,18 @@ impl Derive for Bip32DeterministicPrivateKey {
             parts.next();
         }
 
+        println!("Bip32DeterministicPrivateKey {:?}", parts);
         let children_nums = parts
             .map(str::parse)
-            .collect::<std::result::Result<Vec<ChildNumber>, Bip32Error>>()?;
+            .collect::<std::result::Result<Vec<ChildNumber>, Bip32Error>>();
+        println!(
+            "Bip32DeterministicPrivateKey children_nums {:?}",
+            children_nums
+        );
+        let children_nums = children_nums?;
+        println!("Bip32DeterministicPrivateKey xx");
         let child_key = extended_key.derive_priv(&SECP256K1_ENGINE, &children_nums)?;
-
+        println!("Bip32DeterministicPrivateKey child_key {:?}", child_key);
         Ok(Bip32DeterministicPrivateKey(child_key))
     }
 }
