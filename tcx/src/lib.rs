@@ -8,7 +8,6 @@ use std::ffi::{CStr, CString};
 
 use crate::error_handling::{landingpad, LAST_ERROR};
 use anyhow::{format_err, Result};
-use prost::Message;
 use std::os::raw::c_char;
 
 #[allow(deprecated)]

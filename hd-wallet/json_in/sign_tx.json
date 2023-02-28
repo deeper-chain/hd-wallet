@@ -1,0 +1,20 @@
+{
+	"method": "sign_tx",
+	"param": {
+		"id": "51d39c38-994f-448a-a2bd-2cd97cafb0fc",
+		"chain_type": "ETHEREUM",
+		"address": "0x262aea7144448c607ed7c28ab06dd38db658c689",
+		"input": {
+			"nonce": "1",
+			"to": "0x362aea7144448c607ed7c28ab06dd38db658c689",
+			"value": "1000000000000000",
+			"gas_price": "1000000000000000",
+			"gas": "21000",
+			"data": "",
+			"network": "GOERLI"
+		},
+		"key": {
+			"Password": ""
+		}
+	}
+}

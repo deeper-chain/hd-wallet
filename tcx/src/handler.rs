@@ -172,8 +172,6 @@ pub fn hd_store_import(data: &str) -> Result<String> {
         }
     }
 
-    println!("founded_id {:?}", founded_id);
-
     if founded_id.is_some() && !param.overwrite {
         return Err(format_err!("{}", "address_already_exist"));
     }
@@ -676,15 +674,8 @@ pub fn get_public_key(data: &str) -> Result<String> {
 }
 
 pub fn sign_filecoin_tx(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
-    let input: UnsignedMessage = serde_json::from_slice(
-        param
-            .input
-            .as_ref()
-            .expect("invalid_message")
-            .clone()
-            .as_slice(),
-    )
-    .expect("FilecoinTxIn");
+    let input: UnsignedMessage =
+        serde_json::from_str(&param.input.to_string()).expect("FilecoinTxIn");
 
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message_to_string(&signed_tx)
@@ -692,8 +683,7 @@ pub fn sign_filecoin_tx(param: &SignParam, keystore: &mut Keystore) -> Result<St
 
 pub fn sign_btc_fork_transaction(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
     let input: BtcForkTxInput =
-        serde_json::from_slice(param.input.as_ref().expect("tx_input").clone().as_slice())
-            .expect("BitcoinForkTransactionInput");
+        serde_json::from_str(&param.input.to_string()).expect("BitcoinForkTransactionInput");
     let coin = coin_info_from_param(&param.chain_type, &input.network, &input.seg_wit, "")?;
 
     let signed_tx: BtcForkSignedTxOutput = if param.chain_type.as_str() == "BITCOINCASH" {
@@ -719,17 +709,13 @@ pub fn sign_btc_fork_transaction(param: &SignParam, keystore: &mut Keystore) -> 
 }
 
 pub fn sign_nervos_ckb(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
-    let input: CkbTxInput =
-        serde_json::from_slice(param.input.as_ref().expect("tx_iput").clone().as_slice())
-            .expect("CkbTxInput");
+    let input: CkbTxInput = serde_json::from_str(&param.input.to_string()).expect("CkbTxInput");
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message_to_string(&signed_tx)
 }
 
 pub fn sign_tron_tx(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
-    let input: TronTxInput =
-        serde_json::from_slice(param.input.as_ref().expect("tx_input").clone().as_slice())
-            .expect("TronTxInput");
+    let input: TronTxInput = serde_json::from_str(&param.input.to_string()).expect("TronTxInput");
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
 
     encode_message_to_string(&signed_tx)
@@ -770,8 +756,7 @@ pub fn tron_sign_message(data: &str) -> Result<String> {
     };
 
     let input: TronMessageInput =
-        serde_json::from_slice(param.input.expect("TronMessageInput").clone().as_slice())
-            .expect("TronMessageInput");
+        serde_json::from_str(&param.input.to_string()).expect("TronMessageInput");
     let signed_tx = guard
         .keystore_mut()
         .sign_message(&param.chain_type, &param.address, &input)?;
@@ -796,15 +781,8 @@ pub fn get_derived_key(data: &str) -> Result<String> {
 }
 
 pub fn sign_substrate_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
-    let input: SubstrateRawTxIn = serde_json::from_slice(
-        param
-            .input
-            .as_ref()
-            .expect("raw_tx_input")
-            .clone()
-            .as_slice(),
-    )
-    .expect("SubstrateTxIn");
+    let input: SubstrateRawTxIn =
+        serde_json::from_str(&param.input.to_string()).expect("SubstrateTxIn");
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message_to_string(&signed_tx)
 }
@@ -891,29 +869,13 @@ pub fn unlock_then_crash(data: &str) -> Result<String> {
 }
 
 pub fn sign_tezos_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
-    let input: TezosRawTxIn = serde_json::from_slice(
-        param
-            .input
-            .as_ref()
-            .expect("raw_tx_input")
-            .clone()
-            .as_slice(),
-    )
-    .expect("TezosRawTxIn");
+    let input: TezosRawTxIn = serde_json::from_str(&param.input.to_string()).expect("TezosRawTxIn");
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message_to_string(&signed_tx)
 }
 
 pub fn sign_ethereum_tx_raw(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
-    let input: EthereumTxIn = serde_json::from_slice(
-        param
-            .input
-            .as_ref()
-            .expect("raw_tx_input")
-            .clone()
-            .as_slice(),
-    )
-    .expect("EthereumTxIn");
+    let input: EthereumTxIn = serde_json::from_str(&param.input.to_string()).expect("EthereumTxIn");
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message_to_string(&signed_tx)
 }

@@ -1,0 +1,11 @@
+{
+	"method": "hd_store_import",
+	"param": {
+		"mnemonic": "sugar car august uniform romance upset burger mesh polar scissors frame mention",
+		"name": "mytest",
+		"overwrite": true,
+		"password": "",
+		"password_hint": "",
+		"source": "MNEMONIC"
+	}
+}

@@ -1,0 +1,11 @@
+{
+	"method": "private_key_store_import",
+	"param": {
+		"private_key": "9ef99d4d5647abb965b58ad7a0f040eaa2aa5affbfc3d1aff2e9d442ba109175",
+		"name": "test",
+		"overwrite": true,
+		"password": "",
+		"password_hint": "",
+		"encoding": "ETHEREUM"
+	}
+}

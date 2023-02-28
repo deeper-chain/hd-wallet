@@ -14,9 +14,8 @@ fn _to_c_char(str: &str) -> *const c_char {
 }
 
 fn handle_input_msg(input: String) {
-    println!("recv handle_input_msg {:?}", input);
+    //println!("recv handle_input_msg {:?}", input);
     let action: TcxAction = serde_json::from_str(&input).expect("decode tcx api");
-    println!("recv action {:?}", action);
     let res = match action.method.to_lowercase().as_str() {
         "init_token_core_x" => {
             handler::init_token_core_x(&action.param.to_string()).map(|_| String::new())

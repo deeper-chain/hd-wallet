@@ -6,11 +6,6 @@ pub struct TcxAction {
     pub param: serde_json::Value,
 }
 
-pub enum Operation {
-    InitTokenCoreXParam,
-    ExportPrivateKeyParam,
-}
-
 /// A common response when error occurred.
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct Response {
@@ -229,7 +224,7 @@ pub struct SignParam {
 
     pub address: std::string::String,
 
-    pub input: ::std::option::Option<Vec<u8>>,
+    pub input: serde_json::Value,
 
     pub key: ::std::option::Option<sign_param::Key>,
 }
