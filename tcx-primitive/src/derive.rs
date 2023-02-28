@@ -11,7 +11,7 @@ pub fn get_account_path(path: &str) -> Result<String> {
     let _ = bitcoin::util::bip32::DerivationPath::from_str(path)?;
     let mut children: Vec<&str> = path.split('/').collect();
 
-    ensure!(children.len() >= 4, format!("{} path is too short", path));
+    anyhow::ensure!(children.len() >= 4, format!("{} path is too short", path));
 
     while children.len() > 4 {
         children.remove(children.len() - 1);
@@ -60,7 +60,7 @@ impl DeriveJunction {
 }
 
 impl FromStr for DeriveJunction {
-    type Err = failure::Error;
+    type Err = anyhow::Error;
 
     fn from_str(inp: &str) -> Result<Self> {
         Ok(
@@ -81,7 +81,7 @@ impl FromStr for DeriveJunction {
 }
 
 impl TryInto<ChildNumber> for DeriveJunction {
-    type Error = failure::Error;
+    type Error = anyhow::Error;
 
     fn try_into(self) -> Result<ChildNumber> {
         if let Ok(num) = match self {
@@ -99,8 +99,7 @@ impl TryInto<ChildNumber> for DeriveJunction {
 pub struct DerivePath(Vec<DeriveJunction>);
 
 impl FromStr for DerivePath {
-    type Err = failure::Error;
-
+    type Err = anyhow::Error;
     fn from_str(path: &str) -> Result<Self> {
         let mut parts = path.split('/').peekable();
         // First parts must be `m`.
@@ -240,7 +239,7 @@ mod tests {
             DeriveJunction::Hard(2147483648),
         ];
         for invalid_dj in invalid_djs {
-            let ret: Result<ChildNumber, failure::Error> = invalid_dj.try_into();
+            let ret: anyhow::Result<ChildNumber> = invalid_dj.try_into();
             assert!(ret.is_err());
         }
     }

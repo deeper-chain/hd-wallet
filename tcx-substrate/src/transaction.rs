@@ -1,26 +1,24 @@
-#[derive(Clone, PartialEq, ::prost::Message)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct SubstrateKeystoreParam {
-    #[prost(string, tag = "1")]
     pub keystore: std::string::String,
-    #[prost(string, tag = "2")]
+
     pub password: std::string::String,
-    #[prost(string, tag = "3")]
+
     pub chain_type: std::string::String,
-    #[prost(bool, tag = "4")]
+
     pub overwrite: bool,
 }
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct ExportSubstrateKeystoreResult {
-    #[prost(string, tag = "1")]
     pub keystore: std::string::String,
 }
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct SubstrateRawTxIn {
-    #[prost(string, tag = "1")]
     pub raw_data: std::string::String,
 }
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct SubstrateTxOut {
-    #[prost(string, tag = "1")]
     pub signature: std::string::String,
 }

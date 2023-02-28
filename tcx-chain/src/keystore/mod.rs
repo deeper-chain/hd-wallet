@@ -17,6 +17,7 @@ pub use self::{
 use crate::signer::ChainSigner;
 use tcx_crypto::{Crypto, Pbkdf2Params};
 use tcx_primitive::{TypedDeterministicPublicKey, TypedPrivateKey, TypedPublicKey};
+use thiserror::Error;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -31,36 +32,26 @@ pub(crate) struct Store {
     pub meta: Metadata,
 }
 
-#[derive(Fail, Debug, PartialEq)]
+#[derive(Error, Debug, PartialEq)]
 pub enum Error {
-    #[fail(display = "mnemonic_invalid")]
+    #[error("mnemonic_invalid")]
     MnemonicInvalid,
-    #[fail(display = "mnemonic_word_invalid")]
+    #[error("mnemonic_word_invalid")]
     MnemonicWordInvalid,
-    #[fail(display = "mnemonic_length_invalid")]
+    #[error("mnemonic_length_invalid")]
     MnemonicLengthInvalid,
-    #[fail(display = "mnemonic_checksum_invalid")]
+    #[error("mnemonic_checksum_invalid")]
     MnemonicChecksumInvalid,
-    #[fail(display = "account_not_found")]
+    #[error("account_not_found")]
     AccountNotFound,
-    #[fail(display = "can_not_derive_key")]
+    #[error("can_not_derive_key")]
     CannotDeriveKey,
-    #[fail(display = "keystore_locked")]
+    #[error("keystore_locked")]
     KeystoreLocked,
-    #[fail(display = "invalid_version")]
+    #[error("invalid_version")]
     InvalidVersion,
-    #[fail(display = "pkstore_can_not_add_other_curve_account")]
+    #[error("pkstore_can_not_add_other_curve_account")]
     PkstoreCannotAddOtherCurveAccount,
-}
-
-fn transform_mnemonic_error(err: failure::Error) -> Error {
-    let err = err.downcast::<bip39::ErrorKind>().unwrap();
-    match err {
-        bip39::ErrorKind::InvalidChecksum => Error::MnemonicChecksumInvalid,
-        bip39::ErrorKind::InvalidWord => Error::MnemonicWordInvalid,
-        bip39::ErrorKind::InvalidWordLength(_) => Error::MnemonicLengthInvalid,
-        _ => Error::MnemonicInvalid,
-    }
 }
 
 /// Account that presents one blockchain wallet on a keystore

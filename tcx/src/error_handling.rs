@@ -1,22 +1,17 @@
 use crate::filemanager::KEYSTORE_MAP;
-use core::result;
-use failure::{Backtrace, Error};
+
 use std::{cell::RefCell, mem, panic};
-pub type Result<T> = result::Result<T, Error>;
+
+use anyhow::{format_err, Error, Result};
+use std::backtrace::Backtrace;
 
 thread_local! {
     pub static LAST_ERROR: RefCell<Option<Error>> = RefCell::new(None);
-    pub static LAST_BACKTRACE: RefCell<Option<(Option<String>, Backtrace)>> = RefCell::new(None);
 }
 
 #[cfg_attr(tarpaulin, skip)]
 #[allow(irrefutable_let_patterns)]
 fn notify_err(err: Error) {
-    if let _backtrace = err.backtrace() {
-        LAST_BACKTRACE.with(|e| {
-            *e.borrow_mut() = Some((None, Backtrace::new()));
-        });
-    }
     LAST_ERROR.with(|e| {
         *e.borrow_mut() = Some(err);
     });

@@ -47,14 +47,15 @@ impl DeterministicPrivateKey for BLSDeterministicPrivateKey {
     fn from_seed(seed: &[u8]) -> Result<Self> {
         let master_sk = derive_master_sk(seed);
         if master_sk.is_err() {
-            return Err(failure::err_msg("invalid seed"));
+            return Err(anyhow::anyhow!("invalid seed"));
         }
 
         Ok(BLSDeterministicPrivateKey(master_sk.unwrap()))
     }
 
     fn from_mnemonic(mnemonic: &str) -> Result<Self> {
-        let mn = Mnemonic::from_phrase(mnemonic, Language::English)?;
+        let mn = Mnemonic::from_phrase(mnemonic, Language::English)
+            .map_err(|err| anyhow::anyhow!("Mnemonic err {} ", err))?;
         let seed = bip39::Seed::new(&mn, "");
         BLSDeterministicPrivateKey::from_seed(seed.as_bytes())
     }
@@ -173,7 +174,7 @@ pub fn derive_child(parent_sk: BigUint, index: BigUint) -> BigUint {
 
 pub fn derive_master_sk(seed: &[u8]) -> Result<BigUint> {
     if seed.len() < 16 {
-        return Err(failure::err_msg(
+        return Err(anyhow::anyhow!(
             "seed must be greater than or equal to 16 bytes",
         ));
     }

@@ -15,16 +15,17 @@ use tcx_crypto::numberic_util::random_iv;
 use tcx_primitive::{
     DeterministicPrivateKey, PrivateKey, PublicKey, Sr25519PrivateKey, TypedPublicKey,
 };
+use thiserror::Error;
 use xsalsa20poly1305::aead::{generic_array::GenericArray, Aead, NewAead};
 use xsalsa20poly1305::XSalsa20Poly1305;
 
-#[derive(Fail, Debug, PartialOrd, PartialEq)]
+#[derive(Error, Debug, PartialOrd, PartialEq)]
 pub enum Error {
-    #[fail(display = "invalid_keystore# {}", _0)]
+    #[error("invalid_keystore# {}", _0)]
     InvalidKeystore(String),
-    #[fail(display = "keystore_public_key_unmatch")]
+    #[error("keystore_public_key_unmatch")]
     KeystorePublicKeyUnmatch,
-    #[fail(display = "password_incorrect")]
+    #[error("password_incorrect")]
     PasswordIncorrect,
 }
 
@@ -133,7 +134,7 @@ fn scrypt_param_from_encoded(encoded: &[u8]) -> Result<(scrypt::ScryptParams, Ve
 
     let inner_params = scrypt::ScryptParams::new(log_n as u8, r, p).expect("init scrypt params");
     if n != PJS_SCRYPT_N || p != PJS_SCRYPT_P || r != PJS_SCRYPT_R {
-        Err(format_err!("Pjs keystore invalid params"))
+        Err(anyhow::anyhow!("Pjs keystore invalid params"))
     } else {
         Ok((inner_params, salt.to_vec()))
     }
@@ -202,16 +203,16 @@ impl SubstrateKeystore {
         if self.encoding.version == "3" {
             if !hex_re.is_match(&self.encoded) {
                 return base64::decode(&self.encoded)
-                    .map_err(|_| format_err!("decode_cipher_text"));
+                    .map_err(|_| anyhow::anyhow!("decode_cipher_text"));
             }
         }
 
         if self.encoded.starts_with("0x") {
             return hex::decode(&self.encoded[2..])
-                .map_err(|_| format_err!("decode_cipher_text decode hex"));
+                .map_err(|_| anyhow::anyhow!("decode_cipher_text decode hex"));
         } else {
             return hex::decode(&self.encoded)
-                .map_err(|_| format_err!("decode_cipher_text decode hex"));
+                .map_err(|_| anyhow::anyhow!("decode_cipher_text decode hex"));
         }
     }
 
@@ -287,7 +288,7 @@ fn encrypt_content(password: &str, plaintext: &[u8]) -> Result<String> {
     let nonce = GenericArray::from_slice(&nonce_bytes);
     let encoded = cipher
         .encrypt(&nonce, plaintext)
-        .map_err(|_e| format_err!("{}", "encrypt error"))?;
+        .map_err(|_e| anyhow::anyhow!("{}", "encrypt error"))?;
 
     let scrypt_params_encoded = [
         salt,

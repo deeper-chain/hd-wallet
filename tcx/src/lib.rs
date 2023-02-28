@@ -1,24 +1,22 @@
-use std::ffi::{CStr, CString};
-
-use std::os::raw::c_char;
-
-use prost::Message;
-
 pub mod api;
-
-use crate::api::{Response, TcxAction};
-
+pub mod api_json;
 pub mod error_handling;
 pub mod handler;
 
-use crate::error_handling::{landingpad, LAST_BACKTRACE, LAST_ERROR};
+use crate::api_json::{Response, TcxAction};
+use std::ffi::{CStr, CString};
+
+use crate::error_handling::{landingpad, LAST_ERROR};
+use anyhow::{format_err, Result};
+use prost::Message;
+use std::os::raw::c_char;
+
 #[allow(deprecated)]
 use crate::handler::{
-    encode_message, export_mnemonic, export_private_key, get_derived_key, hd_store_create,
-    hd_store_export, hd_store_import, keystore_common_accounts, keystore_common_delete,
-    keystore_common_derive, keystore_common_exists, keystore_common_verify,
-    private_key_store_export, private_key_store_import, sign_tx, tron_sign_message,
-    unlock_then_crash,
+    export_mnemonic, export_private_key, get_derived_key, hd_store_create, hd_store_export,
+    hd_store_import, keystore_common_accounts, keystore_common_delete, keystore_common_derive,
+    keystore_common_exists, keystore_common_verify, private_key_store_export,
+    private_key_store_import, sign_tx, tron_sign_message, unlock_then_crash,
 };
 
 mod filemanager;
@@ -26,18 +24,19 @@ mod filemanager;
 use crate::handler::{
     export_substrate_keystore, get_public_key, import_substrate_keystore, substrate_keystore_exists,
 };
-use error_handling::Result;
 use parking_lot::RwLock;
+use serde::Serialize;
 
-extern crate serde_json;
-
-#[macro_use]
-extern crate failure;
-#[macro_use]
-extern crate lazy_static;
-
-lazy_static! {
+lazy_static::lazy_static! {
     pub static ref IS_DEBUG: RwLock<bool> = RwLock::new(false);
+}
+
+pub fn encode_message(msg: impl Serialize) -> Result<Vec<u8>> {
+    serde_json::to_vec(&msg).map_err(|err| anyhow::anyhow!("to json err {}", err))
+}
+
+pub fn encode_message_to_string(msg: impl Serialize) -> Result<String> {
+    serde_json::to_string(&msg).map_err(|err| anyhow::anyhow!("to json err {}", err))
 }
 
 fn _to_c_char(str: &str) -> *const c_char {
@@ -49,13 +48,10 @@ fn _to_str(json_str: *const c_char) -> &'static str {
     json_c_str.to_str().unwrap()
 }
 
-pub fn call_api(method: &str, msg: impl Message) -> Result<Vec<u8>> {
+pub fn call_api(method: &str, msg: impl Serialize) -> Result<Vec<u8>> {
     let param = TcxAction {
         method: method.to_string(),
-        param: Some(::prost_types::Any {
-            type_url: "imtoken".to_string(),
-            value: encode_message(msg).unwrap(),
-        }),
+        param: encode_message_to_string(msg).unwrap(),
     };
     let _ = unsafe { clear_err() };
     let param_bytes = encode_message(param).unwrap();
@@ -64,7 +60,7 @@ pub fn call_api(method: &str, msg: impl Message) -> Result<Vec<u8>> {
     let err = unsafe { _to_str(get_last_err_message()) };
     if !err.is_empty() {
         let err_bytes = hex::decode(err).unwrap();
-        let err_ret: Response = Response::decode(err_bytes.as_slice()).unwrap();
+        let err_ret: Response = serde_json::from_slice(err_bytes.as_slice()).unwrap();
         Err(format_err!("{}", err_ret.error))
     } else {
         Ok(hex::decode(ret_hex).unwrap())
@@ -88,78 +84,55 @@ pub unsafe extern "C" fn call_tcx_api(hex_str: *const c_char) -> *const c_char {
     let hex_str = hex_c_str.to_str().expect("parse_arguments to_str");
 
     let data = hex::decode(hex_str).expect("parse_arguments hex decode");
-    let action: TcxAction = TcxAction::decode(data.as_slice()).expect("decode tcx api");
-    let reply: Vec<u8> = match action.method.to_lowercase().as_str() {
+    let action: TcxAction = serde_json::from_slice(data.as_slice()).expect("decode tcx api");
+    let reply: String = match action.method.to_lowercase().as_str() {
         "init_token_core_x" => landingpad(|| {
-            handler::init_token_core_x(&action.param.unwrap().value).unwrap();
-            Ok(vec![])
+            handler::init_token_core_x(&action.param).unwrap();
+            Ok(String::new())
         }),
         "scan_keystores" => landingpad(|| {
             handler::scan_keystores().unwrap();
-            Ok(vec![])
+            Ok(String::new())
         }),
-        "hd_store_create" => landingpad(|| hd_store_create(&action.param.unwrap().value)),
-        "hd_store_import" => landingpad(|| hd_store_import(&action.param.unwrap().value)),
-        "hd_store_export" => landingpad(|| hd_store_export(&action.param.unwrap().value)),
-        "export_mnemonic" => landingpad(|| export_mnemonic(&action.param.unwrap().value)),
-        "keystore_common_derive" => {
-            landingpad(|| keystore_common_derive(&action.param.unwrap().value))
-        }
+        "hd_store_create" => landingpad(|| hd_store_create(&action.param)),
+        "hd_store_import" => landingpad(|| hd_store_import(&action.param)),
+        "hd_store_export" => landingpad(|| hd_store_export(&action.param)),
+        "export_mnemonic" => landingpad(|| export_mnemonic(&action.param)),
+        "keystore_common_derive" => landingpad(|| keystore_common_derive(&action.param)),
 
-        "private_key_store_import" => {
-            landingpad(|| private_key_store_import(&action.param.unwrap().value))
-        }
-        "private_key_store_export" => {
-            landingpad(|| private_key_store_export(&action.param.unwrap().value))
-        }
-        "export_private_key" => landingpad(|| export_private_key(&action.param.unwrap().value)),
-        "keystore_common_verify" => {
-            landingpad(|| keystore_common_verify(&action.param.unwrap().value))
-        }
-        "keystore_common_delete" => {
-            landingpad(|| keystore_common_delete(&action.param.unwrap().value))
-        }
-        "keystore_common_exists" => {
-            landingpad(|| keystore_common_exists(&action.param.unwrap().value))
-        }
-        "keystore_common_accounts" => {
-            landingpad(|| keystore_common_accounts(&action.param.unwrap().value))
-        }
+        "private_key_store_import" => landingpad(|| private_key_store_import(&action.param)),
+        "private_key_store_export" => landingpad(|| private_key_store_export(&action.param)),
+        "export_private_key" => landingpad(|| export_private_key(&action.param)),
+        "keystore_common_verify" => landingpad(|| keystore_common_verify(&action.param)),
+        "keystore_common_delete" => landingpad(|| keystore_common_delete(&action.param)),
+        "keystore_common_exists" => landingpad(|| keystore_common_exists(&action.param)),
+        "keystore_common_accounts" => landingpad(|| keystore_common_accounts(&action.param)),
 
-        "sign_tx" => landingpad(|| sign_tx(&action.param.unwrap().value)),
-        "get_public_key" => landingpad(|| get_public_key(&action.param.unwrap().value)),
+        "sign_tx" => landingpad(|| sign_tx(&action.param)),
+        "get_public_key" => landingpad(|| get_public_key(&action.param)),
 
-        "tron_sign_msg" => landingpad(|| tron_sign_message(&action.param.unwrap().value)),
+        "tron_sign_msg" => landingpad(|| tron_sign_message(&action.param)),
 
-        "substrate_keystore_exists" => {
-            landingpad(|| substrate_keystore_exists(&action.param.unwrap().value))
-        }
+        "substrate_keystore_exists" => landingpad(|| substrate_keystore_exists(&action.param)),
 
-        "substrate_keystore_import" => {
-            landingpad(|| import_substrate_keystore(&action.param.unwrap().value))
-        }
+        "substrate_keystore_import" => landingpad(|| import_substrate_keystore(&action.param)),
 
-        "substrate_keystore_export" => {
-            landingpad(|| export_substrate_keystore(&action.param.unwrap().value))
-        }
+        "substrate_keystore_export" => landingpad(|| export_substrate_keystore(&action.param)),
 
         // !!! WARNING !!! used for `cache_dk` feature
-        "get_derived_key" => landingpad(|| get_derived_key(&action.param.unwrap().value)),
+        "get_derived_key" => landingpad(|| get_derived_key(&action.param)),
         // !!! WARNING !!! used for test only
-        "unlock_then_crash" => landingpad(|| unlock_then_crash(&action.param.unwrap().value)),
+        "unlock_then_crash" => landingpad(|| unlock_then_crash(&action.param)),
         _ => landingpad(|| Err(format_err!("unsupported_method"))),
     };
 
-    let ret_str = hex::encode(reply);
-    CString::new(ret_str).unwrap().into_raw()
+    //let ret_str = hex::encode(reply);
+    CString::new(reply).unwrap().into_raw()
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn clear_err() {
     LAST_ERROR.with(|e| {
-        *e.borrow_mut() = None;
-    });
-    LAST_BACKTRACE.with(|e| {
         *e.borrow_mut() = None;
     });
 }

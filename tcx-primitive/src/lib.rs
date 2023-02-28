@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate failure;
-
 mod bip32;
 mod bls;
 mod bls_derive;
@@ -14,9 +11,7 @@ mod secp256k1;
 mod sr25519;
 mod subkey;
 
-use core::result;
-
-pub type Result<T> = result::Result<T, failure::Error>;
+pub use anyhow::Result;
 
 pub use crate::bip32::{Bip32DeterministicPrivateKey, Bip32DeterministicPublicKey};
 pub use crate::derive::{get_account_path, Derive, DeriveJunction, DerivePath};

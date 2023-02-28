@@ -321,7 +321,6 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use failure::_core::str::FromStr;
     use tcx_constants::TEST_PASSWORD;
 
     #[test]

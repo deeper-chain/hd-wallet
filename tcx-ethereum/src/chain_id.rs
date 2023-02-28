@@ -1,7 +1,6 @@
-use failure::format_err;
 use parking_lot::RwLock;
 
-pub type Result<T> = std::result::Result<T, failure::Error>;
+pub use anyhow::Result;
 
 /// Ethereum chain info
 #[derive(Clone)]
@@ -54,6 +53,6 @@ pub fn chain_id_from_network(network: &str) -> Result<u64> {
     if res.len() > 0 {
         Ok(res.pop().unwrap())
     } else {
-        Err(format_err!("No chain id for network"))
+        Err(anyhow::anyhow!("No chain id for network"))
     }
 }

@@ -12,23 +12,21 @@ use tcx_constants::CurveType;
 
 const BIP_PATH: &str = "m/44'/145'/0'";
 
-pub type Result<T> = result::Result<T, failure::Error>;
-
-#[macro_use]
-extern crate failure;
+pub use anyhow::Result;
+use thiserror::Error;
 
 pub use crate::address::{bch_address_from_pri_key, bch_address_from_pub_key};
 pub use crate::transaction::bch_sign_to_tx;
 pub use address::BchAddress;
 pub use transaction::BchTransaction;
 
-#[derive(Fail, Debug)]
+#[derive(Error, Debug)]
 pub enum Error {
-    #[fail(display = "bch_convert_to_legacy_address_failed# address: {}", _0)]
+    #[error("bch_convert_to_legacy_address_failed# address: {}", _0)]
     ConvertToLegacyAddressFailed(String),
-    #[fail(display = "bch_convert_to_cash_address_failed# address: {}", _0)]
+    #[error("bch_convert_to_cash_address_failed# address: {}", _0)]
     ConvertToCashAddressFailed(String),
-    #[fail(display = "construct_bch_address_failed# address: {}", _0)]
+    #[error("construct_bch_address_failed# address: {}", _0)]
     ConstructBchAddressFailed(String),
 }
 

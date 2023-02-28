@@ -96,9 +96,12 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.37"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee67c11feeac938fae061b232e38e0b6d94f97a9df10e6271319325ac4c56a86"
+checksum = "224afbd727c3d6e4b90103ece64b8d1b67fbb1973b1046c2281eed3f3803f800"
+dependencies = [
+ "backtrace",
+]
 
 [[package]]
 name = "arrayref"
@@ -1424,11 +1427,11 @@ checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 name = "hd-wallet"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bch_addr",
  "bitcoin",
  "bitcoin_hashes",
  "bytes 0.5.6",
- "failure",
  "hex 0.4.2",
  "prost 0.6.1",
  "prost-types 0.6.1",
@@ -1445,6 +1448,7 @@ dependencies = [
  "tcx-substrate",
  "tcx-tezos",
  "tcx-tron",
+ "thiserror",
  "tiny-bip39 0.6.2",
 ]
 
@@ -3775,11 +3779,11 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 name = "tcx"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "base58",
  "base64 0.10.1",
  "bytes 0.5.6",
  "ethereum-types 0.9.2",
- "failure",
  "hex 0.4.2",
  "lazy_static",
  "libc",
@@ -3805,16 +3809,17 @@ dependencies = [
  "tcx-substrate",
  "tcx-tezos",
  "tcx-tron",
+ "thiserror",
 ]
 
 [[package]]
 name = "tcx-bch"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bch_addr",
  "bitcoin",
  "bitcoin_hashes",
- "failure",
  "hex 0.3.2",
  "secp256k1 0.19.0",
  "serde",
@@ -3823,6 +3828,7 @@ dependencies = [
  "tcx-chain",
  "tcx-constants",
  "tcx-primitive",
+ "thiserror",
  "tiny-bip39 0.6.2",
 ]
 
@@ -3830,13 +3836,13 @@ dependencies = [
 name = "tcx-btc-fork"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "base64 0.10.1",
  "bech32 0.7.2",
  "bitcoin",
  "bitcoin_hashes",
  "byteorder 1.4.3",
  "bytes 0.5.6",
- "failure",
  "hex 0.3.2",
  "mockall",
  "num-bigint 0.2.6",
@@ -3851,6 +3857,7 @@ dependencies = [
  "tcx-constants",
  "tcx-crypto",
  "tcx-primitive",
+ "thiserror",
  "tiny-bip39 0.6.2",
  "uuid",
 ]
@@ -3859,12 +3866,12 @@ dependencies = [
 name = "tcx-chain"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bitcoin",
  "bitcoin_hashes",
  "byteorder 1.4.3",
  "bytes 0.5.6",
  "cargo-husky",
- "failure",
  "hex 0.4.2",
  "prost 0.6.1",
  "regex",
@@ -3874,6 +3881,7 @@ dependencies = [
  "tcx-constants",
  "tcx-crypto",
  "tcx-primitive",
+ "thiserror",
  "tiny-bip39 0.6.2",
  "uuid",
 ]
@@ -3886,25 +3894,28 @@ dependencies = [
  "blake2b-rs",
  "byteorder 1.4.3",
  "bytes 0.5.6",
- "failure",
  "hex 0.4.2",
  "lazy_static",
  "prost 0.6.1",
+ "serde",
+ "serde_json",
  "tcx-chain",
  "tcx-constants",
  "tcx-crypto",
  "tcx-primitive",
+ "thiserror",
 ]
 
 [[package]]
 name = "tcx-constants"
 version = "0.1.0"
 dependencies = [
- "failure",
+ "anyhow",
  "lazy_static",
  "parking_lot 0.10.2",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -3913,11 +3924,11 @@ version = "0.1.0"
 dependencies = [
  "aes-ctr",
  "aes-soft",
+ "anyhow",
  "bitcoin_hashes",
  "block-modes",
  "crypto-mac 0.7.0",
  "digest 0.8.1",
- "failure",
  "hex 0.4.2",
  "hmac 0.7.1",
  "lazy_static",
@@ -3930,6 +3941,7 @@ dependencies = [
  "serde_json",
  "sha2 0.8.2",
  "tcx-constants",
+ "thiserror",
  "tiny-keccak 1.5.0",
 ]
 
@@ -3937,34 +3949,37 @@ dependencies = [
 name = "tcx-ethereum"
 version = "0.1.1"
 dependencies = [
+ "anyhow",
  "bytes 0.5.6",
  "digest 0.8.1",
  "ethereum-tx-sign",
  "ethereum-types 0.11.0",
- "failure",
  "hex 0.3.2",
  "lazy_static",
  "parking_lot 0.10.2",
  "prost 0.6.1",
  "rlp 0.4.6",
  "rust-crypto",
+ "serde",
+ "serde_json",
  "sha3",
  "tcx-chain",
  "tcx-constants",
  "tcx-crypto",
  "tcx-primitive",
+ "thiserror",
 ]
 
 [[package]]
 name = "tcx-filecoin"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "base32",
  "base64 0.12.3",
  "blake2b-rs",
  "byteorder 1.4.3",
  "bytes 0.5.6",
- "failure",
  "forest_address",
  "forest_bigint",
  "forest_cid",
@@ -3982,12 +3997,14 @@ dependencies = [
  "tcx-constants",
  "tcx-crypto",
  "tcx-primitive",
+ "thiserror",
 ]
 
 [[package]]
 name = "tcx-primitive"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bitcoin",
  "bitcoin_hashes",
  "blake2b_simd",
@@ -3995,7 +4012,6 @@ dependencies = [
  "byteorder 1.4.3",
  "digest 0.8.1",
  "ed25519-bip32",
- "failure",
  "hex 0.3.2",
  "hex-literal 0.2.1",
  "hkdf 0.9.0",
@@ -4011,6 +4027,7 @@ dependencies = [
  "sha2 0.9.2",
  "sp-core",
  "tcx-constants",
+ "thiserror",
  "tiny-bip39 0.6.2",
 ]
 
@@ -4028,12 +4045,12 @@ dependencies = [
 name = "tcx-substrate"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "base58",
  "base64 0.10.1",
  "bs58 0.3.1",
  "byteorder 1.4.3",
  "bytes 0.5.6",
- "failure",
  "hex 0.4.2",
  "parity-scale-codec 2.3.1",
  "prost 0.6.1",
@@ -4050,6 +4067,7 @@ dependencies = [
  "tcx-constants",
  "tcx-crypto",
  "tcx-primitive",
+ "thiserror",
  "xsalsa20poly1305",
 ]
 
@@ -4064,6 +4082,8 @@ dependencies = [
  "prost 0.6.1",
  "prost-types 0.6.1",
  "ring",
+ "serde",
+ "serde_json",
  "tcx-chain",
  "tcx-constants",
  "tcx-crypto",
@@ -4074,13 +4094,13 @@ dependencies = [
 name = "tcx-tron"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bitcoin",
  "bitcoin_hashes",
  "bytebuffer",
  "byteorder 1.4.3",
  "bytes 0.5.6",
  "digest 0.8.1",
- "failure",
  "hex 0.3.2",
  "hex-literal 0.1.4",
  "num-bigint 0.2.6",
@@ -4095,6 +4115,7 @@ dependencies = [
  "tcx-constants",
  "tcx-crypto",
  "tcx-primitive",
+ "thiserror",
  "tiny-bip39 0.6.2",
  "uuid",
 ]
