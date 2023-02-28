@@ -7,8 +7,6 @@ use tcx_chain::{
 use bitcoin_hashes::sha256::Hash;
 use bitcoin_hashes::Hash as TraitHash;
 
-use failure::format_err;
-
 use crate::keccak;
 
 // http://jsoneditoronline.org/index.html?id=2b86a8503ba641bebed73f32b4ac9c42
@@ -58,7 +56,7 @@ impl TraitTransactionSigner<TronTxInput, TronTxOutput> for Keystore {
             Ok(r) => Ok(TronTxOutput {
                 signatures: vec![hex::encode(r)],
             }),
-            Err(_e) => Err(format_err!("{}", "can not format error")),
+            Err(_e) => Err(anyhow::anyhow!("{}", "can not format error")),
         }
     }
 }
@@ -106,7 +104,7 @@ mod tests {
     use tcx_primitive::{PrivateKey, Secp256k1PrivateKey};
 
     #[test]
-    fn sign_transaction() -> core::result::Result<(), failure::Error> {
+    fn sign_transaction() -> Result<()> {
         /*
         (
             r#" {

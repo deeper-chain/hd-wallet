@@ -1,13 +1,14 @@
+use anyhow::anyhow;
 use bip39::{Language, Mnemonic, Seed};
 
 use uuid::Uuid;
 
 use super::Account;
 use super::Address;
-use super::Result;
 use super::{Error, Metadata};
+use anyhow::Result;
 
-use crate::keystore::{transform_mnemonic_error, Store};
+use crate::keystore::Store;
 
 use std::collections::HashMap;
 
@@ -30,8 +31,8 @@ pub struct HdKeystore {
 }
 
 pub fn key_hash_from_mnemonic(mnemonic: &str) -> Result<String> {
-    let mn =
-        Mnemonic::from_phrase(mnemonic, Language::English).map_err(transform_mnemonic_error)?;
+    let mn = Mnemonic::from_phrase(mnemonic, Language::English)
+        .map_err(|err| anyhow::anyhow!("Mnemonic err {}", err))?;
 
     let seed = Seed::new(&mn, "");
 
@@ -74,7 +75,7 @@ impl HdKeystore {
         let mnemonic_str = String::from_utf8(mnemonic_bytes)?;
 
         let _mnemonic = Mnemonic::from_phrase(&mnemonic_str, Language::English)
-            .map_err(transform_mnemonic_error)?;
+            .map_err(|err| anyhow::anyhow!("Mnemonic err {}", err))?;
 
         self.cache = Some(Cache {
             mnemonic: mnemonic_str,

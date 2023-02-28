@@ -17,6 +17,9 @@ hex = "0.3.1"
 bitcoin = "0.25.1"
 ring = "0.16.9"
 
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
 prost = "0.6.1"
 bytes = "0.5.4"
 prost-types = "0.6.1"

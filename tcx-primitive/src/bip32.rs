@@ -42,7 +42,8 @@ impl Bip32DeterministicPrivateKey {
     }
 
     pub fn from_mnemonic(mnemonic: &str) -> Result<Self> {
-        let mn = Mnemonic::from_phrase(mnemonic, Language::English)?;
+        let mn = Mnemonic::from_phrase(mnemonic, Language::English)
+            .map_err(|err| anyhow::anyhow!("Mnemonic err {} ", err))?;
         let seed = bip39::Seed::new(&mn, "");
         let epk = ExtendedPrivKey::new_master(Network::Bitcoin, seed.as_ref())?;
         Ok(Bip32DeterministicPrivateKey(epk))
@@ -58,18 +59,11 @@ impl Derive for Bip32DeterministicPrivateKey {
             parts.next();
         }
 
-        println!("Bip32DeterministicPrivateKey {:?}", parts);
         let children_nums = parts
             .map(str::parse)
             .collect::<std::result::Result<Vec<ChildNumber>, Bip32Error>>();
-        println!(
-            "Bip32DeterministicPrivateKey children_nums {:?}",
-            children_nums
-        );
         let children_nums = children_nums?;
-        println!("Bip32DeterministicPrivateKey xx");
         let child_key = extended_key.derive_priv(&SECP256K1_ENGINE, &children_nums)?;
-        println!("Bip32DeterministicPrivateKey child_key {:?}", child_key);
         Ok(Bip32DeterministicPrivateKey(child_key))
     }
 }
@@ -102,7 +96,8 @@ impl DeterministicPrivateKey for Bip32DeterministicPrivateKey {
     }
 
     fn from_mnemonic(mnemonic: &str) -> Result<Self> {
-        let mn = Mnemonic::from_phrase(mnemonic, Language::English)?;
+        let mn = Mnemonic::from_phrase(mnemonic, Language::English)
+            .map_err(|err| anyhow::anyhow!("Mnemonic err {} ", err))?;
         let seed = bip39::Seed::new(&mn, "");
         let esk = ExtendedPrivKey::new_master(Network::Bitcoin, seed.as_bytes())?;
 

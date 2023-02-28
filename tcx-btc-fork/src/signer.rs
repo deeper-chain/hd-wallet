@@ -120,12 +120,12 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
             total_amount += unspent.amount;
         }
 
-        ensure!(
+        anyhow::ensure!(
             self.tx_input.amount >= DUST as i64,
             "amount_less_than_minimum"
         );
 
-        ensure!(
+        anyhow::ensure!(
             total_amount >= (self.tx_input.amount + self.tx_input.fee),
             "total amount must ge amount + fee"
         );

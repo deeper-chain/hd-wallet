@@ -39,12 +39,13 @@ impl DeterministicPrivateKey for Sr25519PrivateKey {
     type PrivateKey = Sr25519PrivateKey;
 
     fn from_seed(seed: &[u8]) -> Result<Self> {
-        let pair = Pair::from_seed_slice(seed).map_err(|_| format_err!("invalid_seed"))?;
+        let pair = Pair::from_seed_slice(seed).map_err(|_| anyhow::anyhow!("invalid_seed"))?;
         Ok(Sr25519PrivateKey(pair))
     }
 
     fn from_mnemonic(mnemonic: &str) -> Result<Self> {
-        let pair = Pair::from_phrase(mnemonic, None).map_err(|_| format_err!("mnemonic_error"))?;
+        let pair =
+            Pair::from_phrase(mnemonic, None).map_err(|_| anyhow::anyhow!("mnemonic_error"))?;
         Ok(Sr25519PrivateKey(pair.0))
     }
 

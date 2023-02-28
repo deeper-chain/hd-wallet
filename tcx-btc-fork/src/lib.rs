@@ -6,9 +6,6 @@ pub mod transaction;
 use core::result;
 use serde::{Deserialize, Serialize};
 
-#[macro_use]
-extern crate failure;
-
 extern crate num_bigint;
 extern crate num_integer;
 extern crate num_traits;
@@ -16,21 +13,22 @@ extern crate num_traits;
 #[macro_use]
 extern crate tcx_chain;
 
-pub type Result<T> = result::Result<T, failure::Error>;
+pub use anyhow::Result;
 
 pub use signer::{BitcoinForkSinger, BtcForkSegWitTransaction, BtcForkTransaction};
+use thiserror::Error;
 pub use transaction::{BtcForkSignedTxOutput, BtcForkTxInput, Utxo};
 
 pub use address::{BtcForkAddress, PubKeyScript, WifDisplay};
 pub use signer::ScriptPubKeyComponent;
 
-#[derive(Fail, Debug)]
+#[derive(Error, Debug)]
 pub enum Error {
-    #[fail(display = "decrypt_xpub_error")]
+    #[error("decrypt_xpub_error")]
     DecryptXPubError,
-    #[fail(display = "unsupported_chain")]
+    #[error("unsupported_chain")]
     UnsupportedChain,
-    #[fail(display = "missing_network")]
+    #[error("missing_network")]
     MissingNetwork,
 }
 

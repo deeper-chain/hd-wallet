@@ -13,10 +13,8 @@ mod macros {
     }
 }
 
-use core::result;
+pub use anyhow::Result;
 
-#[macro_use]
-extern crate failure;
 extern crate regex;
 
 mod keystore;
@@ -28,5 +26,3 @@ pub use keystore::{
 };
 
 pub use signer::{ChainSigner, MessageSigner, TransactionSigner};
-
-pub type Result<T> = result::Result<T, failure::Error>;
