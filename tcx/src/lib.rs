@@ -51,7 +51,7 @@ fn _to_str(json_str: *const c_char) -> &'static str {
 pub fn call_api(method: &str, msg: impl Serialize) -> Result<Vec<u8>> {
     let param = TcxAction {
         method: method.to_string(),
-        param: encode_message_to_string(msg).unwrap(),
+        param: serde_json::Value::String(encode_message_to_string(msg).unwrap()),
     };
     let _ = unsafe { clear_err() };
     let param_bytes = encode_message(param).unwrap();
@@ -87,42 +87,62 @@ pub unsafe extern "C" fn call_tcx_api(hex_str: *const c_char) -> *const c_char {
     let action: TcxAction = serde_json::from_slice(data.as_slice()).expect("decode tcx api");
     let reply: String = match action.method.to_lowercase().as_str() {
         "init_token_core_x" => landingpad(|| {
-            handler::init_token_core_x(&action.param).unwrap();
+            handler::init_token_core_x(&action.param.to_string()).unwrap();
             Ok(String::new())
         }),
         "scan_keystores" => landingpad(|| {
             handler::scan_keystores().unwrap();
             Ok(String::new())
         }),
-        "hd_store_create" => landingpad(|| hd_store_create(&action.param)),
-        "hd_store_import" => landingpad(|| hd_store_import(&action.param)),
-        "hd_store_export" => landingpad(|| hd_store_export(&action.param)),
-        "export_mnemonic" => landingpad(|| export_mnemonic(&action.param)),
-        "keystore_common_derive" => landingpad(|| keystore_common_derive(&action.param)),
+        "hd_store_create" => landingpad(|| hd_store_create(&action.param.to_string())),
+        "hd_store_import" => landingpad(|| hd_store_import(&action.param.to_string())),
+        "hd_store_export" => landingpad(|| hd_store_export(&action.param.to_string())),
+        "export_mnemonic" => landingpad(|| export_mnemonic(&action.param.to_string())),
+        "keystore_common_derive" => {
+            landingpad(|| keystore_common_derive(&action.param.to_string()))
+        }
 
-        "private_key_store_import" => landingpad(|| private_key_store_import(&action.param)),
-        "private_key_store_export" => landingpad(|| private_key_store_export(&action.param)),
-        "export_private_key" => landingpad(|| export_private_key(&action.param)),
-        "keystore_common_verify" => landingpad(|| keystore_common_verify(&action.param)),
-        "keystore_common_delete" => landingpad(|| keystore_common_delete(&action.param)),
-        "keystore_common_exists" => landingpad(|| keystore_common_exists(&action.param)),
-        "keystore_common_accounts" => landingpad(|| keystore_common_accounts(&action.param)),
+        "private_key_store_import" => {
+            landingpad(|| private_key_store_import(&action.param.to_string()))
+        }
+        "private_key_store_export" => {
+            landingpad(|| private_key_store_export(&action.param.to_string()))
+        }
+        "export_private_key" => landingpad(|| export_private_key(&action.param.to_string())),
+        "keystore_common_verify" => {
+            landingpad(|| keystore_common_verify(&action.param.to_string()))
+        }
+        "keystore_common_delete" => {
+            landingpad(|| keystore_common_delete(&action.param.to_string()))
+        }
+        "keystore_common_exists" => {
+            landingpad(|| keystore_common_exists(&action.param.to_string()))
+        }
+        "keystore_common_accounts" => {
+            landingpad(|| keystore_common_accounts(&action.param.to_string()))
+        }
 
-        "sign_tx" => landingpad(|| sign_tx(&action.param)),
-        "get_public_key" => landingpad(|| get_public_key(&action.param)),
+        "sign_tx" => landingpad(|| sign_tx(&action.param.to_string())),
+        "get_public_key" => landingpad(|| get_public_key(&action.param.to_string())),
 
-        "tron_sign_msg" => landingpad(|| tron_sign_message(&action.param)),
+        "tron_sign_msg" => landingpad(|| tron_sign_message(&action.param.to_string())),
 
-        "substrate_keystore_exists" => landingpad(|| substrate_keystore_exists(&action.param)),
+        "substrate_keystore_exists" => {
+            landingpad(|| substrate_keystore_exists(&action.param.to_string()))
+        }
 
-        "substrate_keystore_import" => landingpad(|| import_substrate_keystore(&action.param)),
+        "substrate_keystore_import" => {
+            landingpad(|| import_substrate_keystore(&action.param.to_string()))
+        }
 
-        "substrate_keystore_export" => landingpad(|| export_substrate_keystore(&action.param)),
+        "substrate_keystore_export" => {
+            landingpad(|| export_substrate_keystore(&action.param.to_string()))
+        }
 
         // !!! WARNING !!! used for `cache_dk` feature
-        "get_derived_key" => landingpad(|| get_derived_key(&action.param)),
+        "get_derived_key" => landingpad(|| get_derived_key(&action.param.to_string())),
         // !!! WARNING !!! used for test only
-        "unlock_then_crash" => landingpad(|| unlock_then_crash(&action.param)),
+        "unlock_then_crash" => landingpad(|| unlock_then_crash(&action.param.to_string())),
         _ => landingpad(|| Err(format_err!("unsupported_method"))),
     };
 
