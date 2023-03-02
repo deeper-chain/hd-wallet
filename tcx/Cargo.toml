@@ -5,7 +5,6 @@ authors = ["Neal Xu <imxuneal@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-tcx-proto = { path = "../tcx-proto" }
 tcx-crypto = { path = "../tcx-crypto", features = ["cache_dk"] }
 tcx-chain = { path = "../tcx-chain", features = ["cache_dk"] }
 tcx-btc-fork = {path = "../tcx-btc-fork"}

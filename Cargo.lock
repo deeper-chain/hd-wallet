@@ -3805,7 +3805,6 @@ dependencies = [
  "tcx-ethereum",
  "tcx-filecoin",
  "tcx-primitive",
- "tcx-proto",
  "tcx-substrate",
  "tcx-tezos",
  "tcx-tron",
@@ -4029,16 +4028,6 @@ dependencies = [
  "tcx-constants",
  "thiserror",
  "tiny-bip39 0.6.2",
-]
-
-[[package]]
-name = "tcx-proto"
-version = "0.1.0"
-dependencies = [
- "bytes 0.5.6",
- "prost 0.6.1",
- "prost-build",
- "prost-types 0.6.1",
 ]
 
 [[package]]

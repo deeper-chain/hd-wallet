@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "tcx-proto",
     "tcx-constants",
     "tcx-primitive",
     "tcx-crypto",
