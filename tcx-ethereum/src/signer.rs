@@ -86,9 +86,12 @@ fn test_sign() {
     data.copy_from_slice(
         &hex::decode("2a3526dd05ad2ebba87673f711ef8c336115254ef8fcd38c4d8166db9a8120e4").unwrap(),
     );
-    let private_key = H256::from_slice(&data);
     let chain_id = chain_id_from_network(input.network.as_str()).unwrap();
-    let raw_rlp_bytes = raw_tx.sign(&private_key, &chain_id);
+    let ecdsa = raw_tx
+        .ecdsa(&data)
+        .map_err(|_| Error::PrivateKeyUnConvert)?;
+
+    let raw_rlp_bytes = raw_tx.sign(&ecdsa);
     let result = "f886808210008302124094132d1ea7ef895b6834d25911656f434d7167093c80a47f746573743200000000000000000000000000000000000000000000000000000060005729a00bba7863888f7a29098458d405f95c95ce30d9b36d259af54d064776a10a283ba0076cddae3a17c3dae4ab09454331b3b6218085d1542e4afeadbc0e8986b4d62e";
     assert_eq!(result, hex::encode(raw_rlp_bytes));
 }

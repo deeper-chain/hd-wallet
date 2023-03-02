@@ -420,7 +420,7 @@ mod tests {
 
         let v = env::var("KDF_ROUNDS");
         if v.is_ok() {
-            let env_kdf_rounds = u32::from_str(&v.unwrap()).unwrap();
+            let env_kdf_rounds = u32::from_str_radix(&v.unwrap(), 10).unwrap();
             env::remove_var("KDF_ROUNDS");
             assert_eq!(default_kdf_rounds(), 262144);
             env::set_var("KDF_ROUNDS", &env_kdf_rounds.to_string());
