@@ -1,35 +1,41 @@
 use crate::transaction::{EthereumTxIn, EthereumTxOut};
 use crate::{chain_id_from_network, Error};
-use ethereum_tx_sign::RawTransaction;
+use ethereum_tx_sign::{LegacyTransaction, Transaction};
 use ethereum_types::{H160, H256, U256};
 use std::convert::TryFrom;
 use std::str::FromStr;
 
 use tcx_chain::{Keystore, Result, TransactionSigner};
 
-impl TryFrom<&EthereumTxIn> for RawTransaction {
+impl TryFrom<&EthereumTxIn> for LegacyTransaction {
     type Error = crate::Error;
 
     fn try_from(input: &EthereumTxIn) -> core::result::Result<Self, Self::Error> {
-        let nonce = U256::from_str(input.nonce.as_str()).map_err(|_| Error::InvalidNonce)?;
+        let nonce = u128::from_str(input.nonce.as_str()).map_err(|_| Error::InvalidNonce)?;
         let to = if input.to.len() > 0 {
-            Some(H160::from_str(input.to.as_str()).map_err(|_| Error::InvalidTo)?)
+            Some(
+                H160::from_str(input.to.as_str())
+                    .map_err(|_| Error::InvalidTo)?
+                    .to_fixed_bytes(),
+            )
         } else {
             None
         };
-        let value = U256::from_str(input.value.as_str()).map_err(|_| Error::InvalidValue)?;
+        let value = u128::from_str(input.value.as_str()).map_err(|_| Error::InvalidValue)?;
         let gas_price =
-            U256::from_str(input.gas_price.as_str()).map_err(|_| Error::InvalidGasPrice)?;
-        let gas = U256::from_str(input.gas.as_str()).map_err(|_| Error::InvalidGas)?;
+            u128::from_str(input.gas_price.as_str()).map_err(|_| Error::InvalidGasPrice)?;
+        let gas = u128::from_str(input.gas.as_str()).map_err(|_| Error::InvalidGas)?;
         let data = hex::decode(input.data.clone()).map_err(|_| Error::InvalidData)?;
-
-        Ok(RawTransaction {
+        let chain =
+            chain_id_from_network(input.network.as_str()).map_err(|_| Error::InvalidChainId)?;
+        Ok(LegacyTransaction {
             nonce,
             to,
             value,
             gas_price,
             gas,
             data,
+            chain,
         })
     }
 }
@@ -41,7 +47,7 @@ impl TransactionSigner<EthereumTxIn, EthereumTxOut> for Keystore {
         address: &str,
         tx: &EthereumTxIn,
     ) -> Result<EthereumTxOut> {
-        let unsigned_tx = RawTransaction::try_from(tx);
+        let unsigned_tx = LegacyTransaction::try_from(tx);
         let unsigned_tx = unsigned_tx?;
         let account = self.account(symbol, address);
         if account.is_none() {
@@ -52,9 +58,11 @@ impl TransactionSigner<EthereumTxIn, EthereumTxOut> for Keystore {
             .find_private_key(&symbol, &address)
             .map_err(|_| Error::CannotGetPrivateKey)?;
 
-        let private_key = H256::from_slice(private_key.to_bytes().as_slice());
-        let chain_id = chain_id_from_network(tx.network.as_str())?;
-        let signature = hex::encode(unsigned_tx.sign(&private_key, &chain_id));
+        let ecdsa = unsigned_tx
+            .ecdsa(private_key.to_bytes().as_slice())
+            .map_err(|_| Error::PrivateKeyUnConvert)?;
+
+        let signature = hex::encode(unsigned_tx.sign(&ecdsa));
 
         Ok(EthereumTxOut { signature })
     }
@@ -73,7 +81,7 @@ fn test_sign() {
         network: "ROPSTEN".to_string(),
     };
 
-    let raw_tx = RawTransaction::try_from(&input).unwrap();
+    let raw_tx = LegacyTransaction::try_from(&input).unwrap();
     let mut data: [u8; 32] = Default::default();
     data.copy_from_slice(
         &hex::decode("2a3526dd05ad2ebba87673f711ef8c336115254ef8fcd38c4d8166db9a8120e4").unwrap(),

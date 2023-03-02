@@ -36,4 +36,10 @@ pub enum Error {
 
     #[error("invalid_data")]
     InvalidData,
+
+    #[error("private_key_unconvert")]
+    PrivateKeyUnConvert,
+
+    #[error("invalid_chain_id")]
+    InvalidChainId,
 }
