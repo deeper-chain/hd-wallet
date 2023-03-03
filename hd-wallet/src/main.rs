@@ -72,7 +72,7 @@ fn handle_input_msg(input: String) {
                 };
                 println!("{:?}", serde_json::to_string(&response))
             } else {
-                println!("{:?}", res);
+                println!("{}", res);
             }
         }
         Err(e) => {
