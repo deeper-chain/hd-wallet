@@ -25,7 +25,7 @@ fn transform_secp256k1_error(err: secp256k1::Error) -> KeyError {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Secp256k1PublicKey(pub PublicKey);
 
 #[derive(Clone)]
