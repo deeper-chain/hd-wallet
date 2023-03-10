@@ -48,10 +48,14 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
         address: &str,
         tx: &BitcoinForkSinger<S, T>,
     ) -> Result<BtcForkSignedTxOutput> {
+        println!("1");
         let change_address = if self.determinable() {
+            println!("2");
             let dpk = self.find_deterministic_public_key(symbol, address)?;
+            println!("3");
             tx.change_address(&dpk)?
         } else {
+            println!("4");
             S::address_script_pub_key(&address)?
         };
 
@@ -59,12 +63,14 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
 
         for x in tx.tx_input.unspents.iter() {
             if x.derived_path.len() > 0 {
+                println!("5");
                 sks.push(
                     self.find_private_key_by_path(symbol, address, &x.derived_path)?
                         .as_secp256k1()?
                         .clone(),
                 );
             } else {
+                println!("6");
                 sks.push(
                     self.find_private_key(symbol, &x.address)?
                         .as_secp256k1()?
@@ -73,6 +79,7 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
             }
         }
 
+        println!("7");
         tx.sign_transaction(&sks, change_address)
     }
 }
@@ -172,6 +179,9 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
         keys: &[impl PrivateKey],
         change_addr_pubkey: Script,
     ) -> Result<BtcForkSignedTxOutput> {
+        for i in keys {
+            println!("piv key {:#?}", i.to_bytes());
+        }
         let tx_outs = self.tx_outs(change_addr_pubkey)?;
         let tx_inputs = self.tx_inputs();
         let tx = Transaction {

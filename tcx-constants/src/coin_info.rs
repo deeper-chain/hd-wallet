@@ -111,14 +111,14 @@ lazy_static! {
         });
         coin_infos.push(CoinInfo {
             coin: "POLKADOT".to_string(),
-            derivation_path: "//polkadot//imToken/0".to_string(),
+            derivation_path: "//polkadot//deeper/0".to_string(),
             curve: CurveType::SubSr25519,
             network: "".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "KUSAMA".to_string(),
-            derivation_path: "//kusama//imToken/0".to_string(),
+            derivation_path: "//kusama//deeper/0".to_string(),
             curve: CurveType::SubSr25519,
             network: "".to_string(),
             seg_wit: "".to_string(),
