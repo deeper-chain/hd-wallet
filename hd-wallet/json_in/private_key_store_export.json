@@ -1,0 +1,10 @@
+
+{
+	"method": "private_key_store_export",
+	"param": {
+		"id": "807f1910-94d6-4438-b0a2-f051a1eda81b",
+		"password": "",
+		"chain_type": "BITCOIN",
+        "network": "TESTNET"
+    }
+}

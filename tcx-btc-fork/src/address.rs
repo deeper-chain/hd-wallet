@@ -61,6 +61,7 @@ impl Address for BtcForkAddress {
     fn is_valid(address: &str, coin: &CoinInfo) -> bool {
         let ret = BtcForkAddress::from_str(address);
         if ret.is_err() {
+            println!("ret {:?}", ret.err());
             false
         } else {
             let addr: BtcForkAddress = ret.unwrap();
@@ -200,6 +201,7 @@ impl FromStr for BtcForkAddress {
             });
         }
 
+        println!(" ss58 {}", s);
         let data = decode_base58(s)?;
         let (network, payload) = match data[0] {
             0 => {

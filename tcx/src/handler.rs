@@ -622,7 +622,7 @@ pub fn sign_tx(data: &str) -> Result<String> {
             KeystoreGuard::unlock_by_derived_key(keystore, &derived_key)?
         }
     };
-
+    println!("***** {}", param.chain_type);
     match param.chain_type.as_str() {
         "BITCOINCASH" | "LITECOIN" | "BITCOIN" => {
             sign_btc_fork_transaction(&param, guard.keystore_mut())
