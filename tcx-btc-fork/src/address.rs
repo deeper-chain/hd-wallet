@@ -2,13 +2,12 @@ use crate::signer::ScriptPubKeyComponent;
 use crate::Error;
 use crate::Result;
 
-use bitcoin::hash_types::PubkeyHash as PubkeyHashType;
-use bitcoin::hash_types::ScriptHash as ScriptHashType;
+use bitcoin::hash_types::{PubkeyHash as PubkeyHashType, ScriptHash as ScriptHashType};
 use bitcoin::network::constants::Network;
-use bitcoin::util::address::Error as BtcAddressError;
-use bitcoin::util::address::Payload;
-use bitcoin::util::address::Payload::PubkeyHash;
-use bitcoin::util::base58;
+use bitcoin::util::{
+    address::{Error as BtcAddressError, Payload, Payload::PubkeyHash, WitnessVersion},
+    base58,
+};
 use bitcoin::{Address as BtcAddress, Script};
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::Hash;
@@ -54,14 +53,12 @@ impl Address for BtcForkAddress {
         } else {
             BtcForkAddress::p2pkh(&public_key.to_bytes(), &network)?.to_string()
         };
-        println!("BtcForkAddress from_public_key {:?}", addr);
         Ok(addr.to_string())
     }
 
     fn is_valid(address: &str, coin: &CoinInfo) -> bool {
         let ret = BtcForkAddress::from_str(address);
         if ret.is_err() {
-            println!("ret {:?}", ret.err());
             false
         } else {
             let addr: BtcForkAddress = ret.unwrap();
@@ -165,34 +162,43 @@ fn decode_base58(addr: &str) -> result::Result<Vec<u8>, BtcAddressError> {
 
 impl FromStr for BtcForkAddress {
     type Err = BtcAddressError;
-
     fn from_str(s: &str) -> result::Result<BtcForkAddress, BtcAddressError> {
-        // try bech32
+        use std::convert::TryFrom;
+
         let bech32_network = bech32_network(s);
+
         if let Some(network) = bech32_network {
             // decode as bech32
-            let (_, payload) = bech32::decode(s)?;
+            let (_, payload, variant) = bech32::decode(s)?;
             if payload.is_empty() {
                 return Err(BtcAddressError::EmptyBech32Payload);
             }
 
             // Get the script version and program (converted from 5-bit to 8-bit)
-            let (version, program): (bech32::u5, Vec<u8>) = {
+            let (version, program): (WitnessVersion, Vec<u8>) = {
                 let (v, p5) = payload.split_at(1);
-                (v[0], bech32::FromBase32::from_base32(p5)?)
+                (
+                    WitnessVersion::try_from(v[0])?,
+                    bech32::FromBase32::from_base32(p5)?,
+                )
             };
 
-            // Generic segwit checks.
-            if version.to_u8() > 16 {
-                return Err(BtcAddressError::InvalidWitnessVersion(version.to_u8()));
-            }
             if program.len() < 2 || program.len() > 40 {
                 return Err(BtcAddressError::InvalidWitnessProgramLength(program.len()));
             }
 
             // Specific segwit v0 check.
-            if version.to_u8() == 0 && (program.len() != 20 && program.len() != 32) {
+            if version == WitnessVersion::V0 && (program.len() != 20 && program.len() != 32) {
                 return Err(BtcAddressError::InvalidSegwitV0ProgramLength(program.len()));
+            }
+
+            // Encoding check
+            let expected = version.bech32_variant();
+            if expected != variant {
+                return Err(BtcAddressError::InvalidBech32Variant {
+                    expected,
+                    found: variant,
+                });
             }
 
             return Ok(BtcForkAddress {
@@ -201,8 +207,19 @@ impl FromStr for BtcForkAddress {
             });
         }
 
-        println!(" ss58 {}", s);
-        let data = decode_base58(s)?;
+        // Base58
+        if s.len() > 50 {
+            return Err(BtcAddressError::Base58(base58::Error::InvalidLength(
+                s.len() * 11 / 15,
+            )));
+        }
+        let data = base58::from_check(s)?;
+        if data.len() != 21 {
+            return Err(BtcAddressError::Base58(base58::Error::InvalidLength(
+                data.len(),
+            )));
+        }
+
         let (network, payload) = match data[0] {
             0 => {
                 let coin_info = coin_info_from_param("BITCOIN", "MAINNET", "NONE", "")
@@ -261,9 +278,9 @@ impl FromStr for BtcForkAddress {
                 )
             }
             x => {
-                return Err(BtcAddressError::Base58(base58::Error::InvalidVersion(
-                    vec![x],
-                )));
+                return Err(BtcAddressError::Base58(
+                    base58::Error::InvalidAddressVersion(x),
+                ));
             }
         };
 
@@ -291,8 +308,8 @@ impl Display for BtcForkAddress {
                 program: ref prog,
             } => {
                 let hrp = self.network.hrp;
-                let mut bech32_writer = bech32::Bech32Writer::new(hrp, fmt)?;
-                bech32::WriteBase32::write_u5(&mut bech32_writer, ver)?;
+                let mut bech32_writer = bech32::Bech32Writer::new(hrp, ver.bech32_variant(), fmt)?;
+                bech32::WriteBase32::write_u5(&mut bech32_writer, ver.into())?;
                 bech32::ToBase32::write_base32(&prog, &mut bech32_writer)
             }
         }

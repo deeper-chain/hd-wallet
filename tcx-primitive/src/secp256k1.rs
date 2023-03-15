@@ -3,7 +3,7 @@ use crate::ecc::{KeyError, PrivateKey as TraitPrivateKey, PublicKey as TraitPubl
 
 use bitcoin::Network;
 
-use bitcoin::util::key::{PrivateKey, PublicKey};
+use bitcoin::{PrivateKey, PublicKey};
 
 use crate::{Result, Ss58Codec};
 use bitcoin::util::base58;
@@ -12,17 +12,20 @@ use bitcoin::secp256k1::Message;
 use tcx_constants::{network_from_coin, CoinInfo};
 
 #[cfg_attr(tarpaulin, skip)]
-fn transform_secp256k1_error(err: secp256k1::Error) -> KeyError {
-    match err {
-        secp256k1::Error::IncorrectSignature => KeyError::InvalidSignature,
-        secp256k1::Error::InvalidMessage => KeyError::InvalidMessage,
-        secp256k1::Error::InvalidPublicKey => KeyError::InvalidPublicKey,
-        secp256k1::Error::InvalidSignature => KeyError::InvalidSignature,
-        secp256k1::Error::InvalidSecretKey => KeyError::InvalidPrivateKey,
-        secp256k1::Error::InvalidRecoveryId => KeyError::InvalidRecoveryId,
-        secp256k1::Error::InvalidTweak => KeyError::InvalidTweak,
-        secp256k1::Error::NotEnoughMemory => KeyError::NotEnoughMemory,
-    }
+fn transform_secp256k1_error(err: secp256k1::Error) -> anyhow::Error {
+    anyhow::anyhow!("secp256k1 error {:?}", err)
+    //match err {
+    // secp256k1::Error::IncorrectSignature => KeyError::InvalidSignature,
+    // secp256k1::Error::InvalidMessage => KeyError::InvalidMessage,
+    // secp256k1::Error::InvalidPublicKey => KeyError::InvalidPublicKey,
+    // secp256k1::Error::InvalidSignature => KeyError::InvalidSignature,
+    // secp256k1::Error::InvalidSecretKey => KeyError::InvalidPrivateKey,
+    // secp256k1::Error::InvalidRecoveryId => KeyError::InvalidRecoveryId,
+    // secp256k1::Error::InvalidTweak => KeyError::InvalidTweak,
+    // secp256k1::Error::NotEnoughMemory => KeyError::NotEnoughMemory,
+    // secp256k1::Error::InvalidPublicKeySum => KeyError::InvalidPublicKey,
+    // secp256k1::Error::InvalidParityValue(key::InvalidParityValue),
+    //}
 }
 
 #[derive(Clone, Debug)]
@@ -45,11 +48,11 @@ impl From<PrivateKey> for Secp256k1PrivateKey {
 
 impl Secp256k1PublicKey {
     pub fn to_compressed(&self) -> Vec<u8> {
-        self.0.key.serialize().to_vec()
+        self.0.to_bytes()
     }
 
     pub fn to_uncompressed(&self) -> Vec<u8> {
-        self.0.key.serialize_uncompressed().to_vec()
+        self.0.to_bytes()
     }
 }
 
@@ -65,7 +68,7 @@ impl TraitPrivateKey for Secp256k1PrivateKey {
     fn from_slice(data: &[u8]) -> Result<Self> {
         let key = secp256k1::SecretKey::from_slice(data).map_err(transform_secp256k1_error)?;
         Ok(Secp256k1PrivateKey(PrivateKey {
-            key,
+            inner: key,
             compressed: true,
             network: Network::Bitcoin,
         }))
@@ -77,13 +80,13 @@ impl TraitPrivateKey for Secp256k1PrivateKey {
 
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>> {
         let msg = Message::from_slice(data).map_err(transform_secp256k1_error)?;
-        let signature = SECP256K1_ENGINE.sign(&msg, &self.0.key);
+        let signature = SECP256K1_ENGINE.sign_ecdsa(&msg, &self.0.inner);
         Ok(signature.serialize_der().to_vec())
     }
 
     fn sign_recoverable(&self, data: &[u8]) -> Result<Vec<u8>> {
         let msg = Message::from_slice(data).map_err(transform_secp256k1_error)?;
-        let signature = SECP256K1_ENGINE.sign_recoverable(&msg, &self.0.key);
+        let signature = SECP256K1_ENGINE.sign_ecdsa_recoverable(&msg, &self.0.inner);
         let (recover_id, sign) = signature.serialize_compact();
         let signed_bytes = [sign[..].to_vec(), vec![(recover_id.to_i32()) as u8]].concat();
         Ok(signed_bytes)
@@ -96,7 +99,7 @@ impl TraitPrivateKey for Secp256k1PrivateKey {
 
 impl std::fmt::Display for Secp256k1PublicKey {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        self.0.key.fmt(f)
+        self.0.fmt(f)
     }
 }
 
@@ -124,7 +127,7 @@ impl Ss58Codec for Secp256k1PrivateKey {
         };
 
         let pk = Secp256k1PrivateKey(PrivateKey {
-            key: secp256k1::SecretKey::from_slice(&data[1..33])?,
+            inner: secp256k1::SecretKey::from_slice(&data[1..33])?,
             compressed,
             network: Network::Bitcoin,
         });
@@ -135,7 +138,7 @@ impl Ss58Codec for Secp256k1PrivateKey {
     fn to_ss58check_with_version(&self, version: &[u8]) -> String {
         let mut ret = [0; 34];
         ret[0..1].copy_from_slice(&version[0..]);
-        ret[1..33].copy_from_slice(&self.0.key[..]);
+        ret[1..33].copy_from_slice(&self.0.to_bytes()[..]);
         if self.0.compressed {
             ret[33] = 1;
             base58::check_encode_slice(&ret[..]).to_string()

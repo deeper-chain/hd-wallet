@@ -71,7 +71,6 @@ impl BchAddress {
 impl Address for BchAddress {
     fn from_public_key(public_key: &TypedPublicKey, coin: &CoinInfo) -> Result<String> {
         let addr = BtcForkAddress::from_public_key(public_key, coin)?;
-        println!("BchAddress from_public_key {:?}", addr);
         legacy_to_bch(&addr)
     }
 
