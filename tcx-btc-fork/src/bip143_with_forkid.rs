@@ -51,7 +51,7 @@ impl SighashComponentsWithForkId {
 
         SighashComponentsWithForkId {
             tx_version: tx.version,
-            tx_locktime: tx.lock_time,
+            tx_locktime: tx.lock_time.to_u32(),
             hash_prevouts,
             hash_sequence,
             hash_outputs,
@@ -66,30 +66,26 @@ impl SighashComponentsWithForkId {
         witness_script: &Script,
         value: u64,
         fork_id: u32,
-    ) -> bitcoin::hash_types::SigHash {
+    ) -> bitcoin::hash_types::Sighash {
         let mut enc = sha256d::Hash::engine();
-        let mut encoder: Cursor<Vec<u8>> = Cursor::new(vec![]);
+        //let mut encoder: Cursor<Vec<u8>> = Cursor::new(vec![]);
         self.tx_version.consensus_encode(&mut enc).unwrap();
-        self.tx_version.consensus_encode(&mut encoder).unwrap();
-
         self.hash_prevouts.consensus_encode(&mut enc).unwrap();
-        self.hash_prevouts.consensus_encode(&mut encoder).unwrap();
+
         self.hash_sequence.consensus_encode(&mut enc).unwrap();
-        self.hash_sequence.consensus_encode(&mut encoder).unwrap();
+
         txin.previous_output.consensus_encode(&mut enc).unwrap();
-        txin.previous_output.consensus_encode(&mut encoder).unwrap();
+
         witness_script.consensus_encode(&mut enc).unwrap();
-        witness_script.consensus_encode(&mut encoder).unwrap();
+
         value.consensus_encode(&mut enc).unwrap();
-        value.consensus_encode(&mut encoder).unwrap();
+
         txin.sequence.consensus_encode(&mut enc).unwrap();
-        txin.sequence.consensus_encode(&mut encoder).unwrap();
+
         self.hash_outputs.consensus_encode(&mut enc).unwrap();
-        self.hash_outputs.consensus_encode(&mut encoder).unwrap();
+
         self.tx_locktime.consensus_encode(&mut enc).unwrap();
-        self.tx_locktime.consensus_encode(&mut encoder).unwrap();
-        fork_id.consensus_encode(&mut enc).unwrap(); // hashtype
-        fork_id.consensus_encode(&mut encoder).unwrap(); // hashtype
-        bitcoin::hash_types::SigHash::hash(&encoder.into_inner())
+        fork_id.consensus_encode(&mut enc).unwrap();
+        bitcoin::hash_types::Sighash::from_hash(sha256d::Hash::from_engine(enc))
     }
 }

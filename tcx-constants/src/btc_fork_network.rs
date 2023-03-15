@@ -1,7 +1,7 @@
 use crate::CoinInfo;
 use parking_lot::RwLock;
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub struct BtcForkNetwork {
     pub coin: &'static str,
     pub network: &'static str,
@@ -117,6 +117,17 @@ lazy_static! {
             network: "TESTNET",
             seg_wit: "NONE",
             hrp: "",
+            p2pkh_prefix: 0x6f,
+            p2sh_prefix: 0xc4,
+            private_prefix: 0xef,
+            xpub_prefix: [0x04, 0x35, 0x87, 0xCF],
+            xprv_prefix: [0x04, 0x35, 0x83, 0x94],
+        });
+        networks.push(BtcForkNetwork {
+            coin: "BITCOIN",
+            network: "TESTNET",
+            seg_wit: "SEGWIT",
+            hrp: "tb",
             p2pkh_prefix: 0x6f,
             p2sh_prefix: 0xc4,
             private_prefix: 0xef,

@@ -23,6 +23,8 @@ use tcx_primitive::{
     TypedDeterministicPublicKey,
 };
 
+//use bitcoin::util::sighash::SighashCache;
+
 const DUST: u64 = 546;
 const SIGHASH_ALL: u8 = 0x01;
 
@@ -48,14 +50,10 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
         address: &str,
         tx: &BitcoinForkSinger<S, T>,
     ) -> Result<BtcForkSignedTxOutput> {
-        println!("1");
         let change_address = if self.determinable() {
-            println!("2");
             let dpk = self.find_deterministic_public_key(symbol, address)?;
-            println!("3");
             tx.change_address(&dpk)?
         } else {
-            println!("4");
             S::address_script_pub_key(&address)?
         };
 
@@ -63,14 +61,12 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
 
         for x in tx.tx_input.unspents.iter() {
             if x.derived_path.len() > 0 {
-                println!("5");
                 sks.push(
                     self.find_private_key_by_path(symbol, address, &x.derived_path)?
                         .as_secp256k1()?
                         .clone(),
                 );
             } else {
-                println!("6");
                 sks.push(
                     self.find_private_key(symbol, &x.address)?
                         .as_secp256k1()?
@@ -78,8 +74,6 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
                 );
             }
         }
-
-        println!("7");
         tx.sign_transaction(&sks, change_address)
     }
 }
@@ -167,8 +161,8 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
                     vout: unspent.vout as u32,
                 },
                 script_sig: Script::new(),
-                sequence: 0xFFFF_FFFF,
-                witness: vec![],
+                sequence: bitcoin::Sequence(0xFFFF_FFFF),
+                witness: bitcoin::Witness::new(),
             });
         }
         tx_inputs
@@ -179,14 +173,11 @@ impl<S: ScriptPubKeyComponent + Address, T: BitcoinTransactionSignComponent>
         keys: &[impl PrivateKey],
         change_addr_pubkey: Script,
     ) -> Result<BtcForkSignedTxOutput> {
-        for i in keys {
-            println!("piv key {:#?}", i.to_bytes());
-        }
         let tx_outs = self.tx_outs(change_addr_pubkey)?;
         let tx_inputs = self.tx_inputs();
         let tx = Transaction {
             version: T::tx_version(),
-            lock_time: 0,
+            lock_time: bitcoin::PackedLockTime(0),
             input: tx_inputs,
             output: tx_outs,
         };
@@ -273,7 +264,10 @@ impl BitcoinTransactionSignComponent for SegWitTransactionSignComponent {
 
                 TxIn {
                     script_sig: Script::from(hex::decode(hex).expect("script_sig")),
-                    witness: vec![witnesses[i].0.clone(), witnesses[i].1.clone()],
+                    witness: bitcoin::Witness::from_vec(vec![
+                        witnesses[i].0.clone(),
+                        witnesses[i].1.clone(),
+                    ]),
                     ..*txin
                 }
             })
@@ -300,7 +294,7 @@ pub trait SignHasher {
         tx: &Transaction,
         index: usize,
         unspent: &Utxo,
-    ) -> Result<(bitcoin::hash_types::SigHash, u32)>;
+    ) -> Result<(bitcoin::hash_types::Sighash, u32)>;
 }
 
 pub struct LegacySignHasher {}
@@ -310,7 +304,7 @@ impl SignHasher for LegacySignHasher {
         tx: &Transaction,
         index: usize,
         unspent: &Utxo,
-    ) -> Result<(bitcoin::hash_types::SigHash, u32)> {
+    ) -> Result<(bitcoin::hash_types::Sighash, u32)> {
         let addr = BtcForkAddress::from_str(&unspent.address)?;
         let script = addr.script_pubkey();
         let hash = tx.signature_hash(index, &script, u32::from(SIGHASH_ALL));
@@ -355,7 +349,7 @@ impl<H: SignHasher> BitcoinTransactionSignComponent for LegacyTransactionSignCom
             .enumerate()
             .map(|(i, txin)| TxIn {
                 script_sig: sign_scripts[i].clone(),
-                witness: vec![],
+                witness: bitcoin::Witness::new(),
                 ..*txin
             })
             .collect();

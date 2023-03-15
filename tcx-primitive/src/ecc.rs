@@ -57,6 +57,10 @@ pub enum KeyError {
     UnsupportNormalDerivation,
     #[error("not_implement")]
     NotImplement,
+    #[error("unkown_version")]
+    UnknownVersion,
+    #[error("other_error")]
+    OtherError,
 }
 
 pub trait PublicKey: Sized {
