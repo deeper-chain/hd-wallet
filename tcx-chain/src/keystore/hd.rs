@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use bip39::{Language, Mnemonic, Seed};
 
+use tcx_primitive::Secp256k1PublicKey;
 use uuid::Uuid;
 
 use super::Account;
@@ -182,8 +183,10 @@ impl HdKeystore {
         let cache = self.cache.as_ref().ok_or(Error::KeystoreLocked)?;
         let root = TypedDeterministicPrivateKey::from_mnemonic(coin_info.curve, &cache.mnemonic)?;
         let private_key = root.derive(&coin_info.derivation_path)?.private_key();
+
         let public_key = private_key.public_key();
         let address = A::from_public_key(&public_key, coin_info)?;
+
         // todo: ext_pub_key
         let ext_pub_key = match coin_info.curve {
             CurveType::SubSr25519 | CurveType::BLS | CurveType::ED25519 => "".to_owned(),

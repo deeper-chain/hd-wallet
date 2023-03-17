@@ -19,6 +19,11 @@ impl From<PrivateKey> for BLSPrivateKey {
         BLSPrivateKey(sk)
     }
 }
+impl std::fmt::Display for BLSPrivateKey {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        write!(f, "{:x?}", self.0.as_bytes())
+    }
+}
 
 impl TraitPrivateKey for BLSPrivateKey {
     type PublicKey = BLSPublicKey;
