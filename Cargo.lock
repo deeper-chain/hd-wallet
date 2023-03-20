@@ -3847,7 +3847,6 @@ dependencies = [
  "byteorder 1.4.3",
  "bytes 0.5.6",
  "hex 0.4.3",
- "parity-scale-codec 2.3.1",
  "rand 0.6.5",
  "regex",
  "scrypt",
