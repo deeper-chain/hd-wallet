@@ -32,7 +32,7 @@ use crate::filemanager::{cache_keystore, clean_keystore, flush_keystore, WALLET_
 use crate::filemanager::{delete_keystore_file, KEYSTORE_MAP};
 use anyhow::{format_err, Result};
 
-use crate::{encode_message, encode_message_to_string, IS_DEBUG};
+use crate::{encode_message_to_string, IS_DEBUG};
 use base58::ToBase58;
 use tcx_chain::tcx_ensure;
 use tcx_chain::Address;
@@ -80,6 +80,7 @@ pub fn init_token_core_x(data: &str) -> Result<()> {
         xpub_common_iv,
         is_debug,
     } = serde_json::from_str(data).unwrap();
+    //std::fs::create_dir(&file_dir)?;
     *WALLET_FILE_DIR.write() = file_dir.to_string();
     *XPUB_COMMON_KEY_128.write() = xpub_common_key.to_string();
     *XPUB_COMMON_IV.write() = xpub_common_iv.to_string();

@@ -58,7 +58,31 @@ lazy_static! {
             network_id: 80001,
             chain_id: 80001,
         });
-
+        chain_infos.push(ChainInfo {
+            network: "ARBITRUM".to_string(),
+            network_id: 42161,
+            chain_id: 42161,
+        });
+        chain_infos.push(ChainInfo {
+            network: "OPTIMISM".to_string(),
+            network_id: 10,
+            chain_id: 10,
+        });
+        chain_infos.push(ChainInfo {
+            network: "AVALANCHE".to_string(),
+            network_id: 43114,
+            chain_id: 43114,
+        });
+        chain_infos.push(ChainInfo {
+            network: "MOONBEAM".to_string(),
+            network_id: 1284,
+            chain_id: 1284,
+        });
+        chain_infos.push(ChainInfo {
+            network: "MOONRIVER".to_string(),
+            network_id: 1285,
+            chain_id: 1285,
+        });
         RwLock::new(chain_infos)
     };
 }
