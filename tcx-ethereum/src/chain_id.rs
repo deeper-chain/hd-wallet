@@ -64,6 +64,11 @@ lazy_static! {
             chain_id: 42161,
         });
         chain_infos.push(ChainInfo {
+            network: "ARB_GEO".to_string(),
+            network_id: 421613,
+            chain_id: 421613,
+        });
+        chain_infos.push(ChainInfo {
             network: "OPTIMISM".to_string(),
             network_id: 10,
             chain_id: 10,
