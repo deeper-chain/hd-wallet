@@ -1,0 +1,11 @@
+{
+	"method": "export_private_key",
+	"param": {
+		"id": "bf8fe2ca-351a-49ba-b78b-49e9de791b39",
+		"password": "",
+		"chain_type": "BITCOIN",
+        "network": "TESTNET",
+		"main_address": "mtYaLxzU8R9AsW2ZiNPLr6AyTSgM1oHcaB",
+		"path":""
+    }
+}
