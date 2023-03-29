@@ -18,9 +18,7 @@ tcx-constants = { path = "../tcx-constants"}
 tcx-tezos = {path = "../tcx-tezos"}
 tcx-ethereum = { path = "../tcx-ethereum" }
 
-prost = "0.6.1"
 bytes = "0.5.4"
-prost-types = "0.6.1"
 
 libc = "0.2.0"
 log = "0.4.6"
@@ -38,9 +36,6 @@ anyhow = { version = "1.0", features = ["backtrace"] }
 [lib]
 name = "tcx"
 crate-type = ["staticlib", "cdylib", "rlib"]
-
-[build-dependencies]
-prost-build = "0.5.0"
 
 [dev-dependencies]
 sp-core = "2.0.0-rc3"

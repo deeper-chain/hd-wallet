@@ -32,6 +32,7 @@ impl Address for SubstrateAddress {
             Ok((_addr, version)) => match coin.coin.as_str() {
                 "KUSAMA" => version == Ss58AddressFormat::KusamaAccount,
                 "POLKADOT" => version == Ss58AddressFormat::PolkadotAccount,
+                "DEEPER" => version == Ss58AddressFormat::SubstrateAccount,
                 _ => false,
             },
             Err(_) => false,

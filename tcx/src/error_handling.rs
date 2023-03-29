@@ -1,9 +1,7 @@
 use crate::filemanager::KEYSTORE_MAP;
 
-use std::{cell::RefCell, mem, panic};
-
 use anyhow::{format_err, Error, Result};
-use std::backtrace::Backtrace;
+use std::{cell::RefCell, mem, panic};
 
 thread_local! {
     pub static LAST_ERROR: RefCell<Option<Error>> = RefCell::new(None);

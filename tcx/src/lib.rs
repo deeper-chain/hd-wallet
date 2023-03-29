@@ -1,4 +1,3 @@
-pub mod api;
 pub mod api_json;
 pub mod error_handling;
 pub mod handler;
@@ -196,7 +195,6 @@ mod tests {
     use crate::api::{HdStoreImportParam, WalletResult};
     use crate::handler::hd_store_import;
     use crate::handler::{encode_message, private_key_store_import};
-    use prost::Message;
     use tcx_chain::Keystore;
     use tcx_constants::{TEST_MNEMONIC, TEST_PASSWORD};
 

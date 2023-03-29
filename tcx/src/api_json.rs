@@ -314,7 +314,7 @@ pub struct PublicKeyResult {
     pub public_key: std::string::String,
 }
 /// only support two types
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(i32)]
 pub enum KeyType {
     Mnemonic = 0,

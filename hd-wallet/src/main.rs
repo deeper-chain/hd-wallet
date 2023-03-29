@@ -1,17 +1,8 @@
-use bytes::BytesMut;
-use prost::Message;
 use std::env;
-use std::ffi::CString;
-use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
-use std::os::raw::c_char;
-use tcx::api_json::{Response, TcxAction};
-use tcx::{encode_message, handler};
-//mod main2;
-
-fn _to_c_char(str: &str) -> *const c_char {
-    CString::new(str).unwrap().into_raw()
-}
+use tcx::{
+    api_json::{Response, TcxAction},
+    handler,
+};
 
 fn handle_input_msg(input: String) {
     //println!("recv handle_input_msg {:?}", input);
@@ -89,12 +80,4 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let _ = handler::scan_keystores();
     handle_input_msg(args[2].clone());
-    // let listener = TcpListener::bind("127.0.0.1:9999").unwrap();
-
-    // for stream in listener.incoming() {
-    //     std::thread::spawn(|| handle_client(stream.unwrap()));
-    // }
-
-    //main2::func(_args.clone());
-    // main3::func(args);
 }

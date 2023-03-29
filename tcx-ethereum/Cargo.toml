@@ -12,7 +12,6 @@ tcx-chain = { path = "../tcx-chain" }
 tcx-primitive = { path = "../tcx-primitive" }
 tcx-constants = { path = "../tcx-constants" }
 
-prost = "0.6.1"
 bytes = "0.5.4"
 thiserror = "1.0"
 anyhow = "1.0"

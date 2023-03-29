@@ -1,4 +1,3 @@
-use prost::Message;
 use std::{
     io::{Read, Write},
     net::TcpStream,
