@@ -12,7 +12,7 @@ use bitcoin::{Address as BtcAddress, Script};
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::Hash;
 use core::result;
-use std::fmt::{Display, Formatter};
+use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 use tcx_chain::Address;
 use tcx_constants::btc_fork_network::{network_form_hrp, network_from_coin, BtcForkNetwork};
@@ -48,12 +48,15 @@ impl Address for BtcForkAddress {
         tcx_ensure!(network.is_some(), Error::MissingNetwork);
         let network = network.expect("network");
 
-        let addr = if coin.seg_wit.as_str() == "P2WPKH" {
+        let seg_str = coin.seg_wit.as_str();
+        let addr = if seg_str == "P2WPKH" {
+            BtcForkAddress::p2wpkh(&public_key.to_bytes(), &network)?.to_string()
+        } else if seg_str == "P2SHWPKH" {
             BtcForkAddress::p2shwpkh(&public_key.to_bytes(), &network)?.to_string()
         } else {
             BtcForkAddress::p2pkh(&public_key.to_bytes(), &network)?.to_string()
         };
-        Ok(addr.to_string())
+        Ok(addr)
     }
 
     fn is_valid(address: &str, coin: &CoinInfo) -> bool {
@@ -86,9 +89,16 @@ impl BtcForkAddress {
         })
     }
 
+    pub fn p2sh(_pub_key: &[u8], _network: &BtcForkNetwork) -> Result<BtcForkAddress> {
+        Err(anyhow::anyhow!("not supoort p2sh address"))
+    }
+
     pub fn p2wpkh(pub_key: &[u8], network: &BtcForkNetwork) -> Result<BtcForkAddress> {
         let pub_key = bitcoin::PublicKey::from_slice(&pub_key)?;
+        //println!("---- pub_key {}", pub_key.inner);
         let addr = BtcAddress::p2wpkh(&pub_key, Network::Bitcoin)?;
+        // println!("---- address {}", addr);
+        // println!("---- payload {:?}", addr.payload);
         Ok(BtcForkAddress {
             payload: addr.payload,
             network: network.clone(),
@@ -140,23 +150,6 @@ fn bech32_network(bech32: &str) -> Option<BtcForkNetwork> {
     match bech32_prefix {
         Some(prefix) => network_form_hrp(prefix),
         None => None,
-    }
-}
-
-fn decode_base58(addr: &str) -> result::Result<Vec<u8>, BtcAddressError> {
-    // Base58
-    if addr.len() > 50 {
-        return Err(BtcAddressError::Base58(base58::Error::InvalidLength(
-            addr.len() * 11 / 15,
-        )));
-    }
-    let data = base58::from_check(&addr)?;
-    if data.len() != 21 {
-        Err(BtcAddressError::Base58(base58::Error::InvalidLength(
-            data.len(),
-        )))
-    } else {
-        Ok(data)
     }
 }
 
@@ -287,10 +280,20 @@ impl FromStr for BtcForkAddress {
         Ok(BtcForkAddress { network, payload })
     }
 }
+struct UpperWriter<W: fmt::Write>(W);
+
+impl<W: fmt::Write> fmt::Write for UpperWriter<W> {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        for c in s.chars() {
+            self.0.write_char(c.to_ascii_uppercase())?;
+        }
+        Ok(())
+    }
+}
 
 impl Display for BtcForkAddress {
     fn fmt(&self, fmt: &mut Formatter) -> core::fmt::Result {
-        match self.payload {
+        match &self.payload {
             Payload::PubkeyHash(ref hash) => {
                 let mut prefixed = [0; 21];
                 prefixed[0] = self.network.p2pkh_prefix;
@@ -303,14 +306,20 @@ impl Display for BtcForkAddress {
                 prefixed[1..].copy_from_slice(&hash[..]);
                 base58::check_encode_slice_to_fmt(fmt, &prefixed[..])
             }
-            Payload::WitnessProgram {
-                version: ver,
-                program: ref prog,
-            } => {
+            Payload::WitnessProgram { version, program } => {
                 let hrp = self.network.hrp;
-                let mut bech32_writer = bech32::Bech32Writer::new(hrp, ver.bech32_variant(), fmt)?;
-                bech32::WriteBase32::write_u5(&mut bech32_writer, ver.into())?;
-                bech32::ToBase32::write_base32(&prog, &mut bech32_writer)
+                //println!("hrp {}", hrp);
+                let mut upper_writer;
+                let writer = if fmt.alternate() {
+                    upper_writer = UpperWriter(fmt);
+                    &mut upper_writer as &mut dyn fmt::Write
+                } else {
+                    fmt as &mut dyn fmt::Write
+                };
+                let mut bech32_writer =
+                    bech32::Bech32Writer::new(hrp, version.bech32_variant(), writer)?;
+                bech32::WriteBase32::write_u5(&mut bech32_writer, (*version).into())?;
+                bech32::ToBase32::write_base32(program, &mut bech32_writer)
             }
         }
     }

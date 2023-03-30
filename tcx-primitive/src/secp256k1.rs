@@ -79,8 +79,14 @@ impl TraitPrivateKey for Secp256k1PrivateKey {
     }
 
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>> {
+        //println!("signature data {:?}", hex::encode(data));
         let msg = Message::from_slice(data).map_err(transform_secp256k1_error)?;
         let signature = SECP256K1_ENGINE.sign_ecdsa(&msg, &self.0.inner);
+        // println!(
+        //     "signature {:?} compact {}",
+        //     signature,
+        //     hex::encode(signature.serialize_compact())
+        // );
         Ok(signature.serialize_der().to_vec())
     }
 

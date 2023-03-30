@@ -187,6 +187,7 @@ impl HdKeystore {
         let public_key = private_key.public_key();
         let address = A::from_public_key(&public_key, coin_info)?;
 
+        //println!("---- derive-coin address {}", address);
         // todo: ext_pub_key
         let ext_pub_key = match coin_info.curve {
             CurveType::SubSr25519 | CurveType::BLS | CurveType::ED25519 => "".to_owned(),
@@ -210,16 +211,18 @@ impl HdKeystore {
             seg_wit: coin_info.seg_wit.to_string(),
             public_key: Some(hex::encode(public_key.to_bytes())),
         };
-
+        // println!("---- derive-coin fat account {:?}", account);
         if let Some(_) = self
             .store
             .active_accounts
             .iter()
             .find(|x| x.address == account.address && x.coin == account.coin)
         {
+            //println!(" exist ");
             return Ok(account);
         } else {
             self.store.active_accounts.push(account.clone());
+            //println!("not exist ");
             Ok(account)
         }
     }
