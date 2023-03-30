@@ -12,6 +12,7 @@ use std::str::FromStr;
 use crate::address::BtcForkAddress;
 use crate::transaction::{BtcForkSignedTxOutput, BtcForkTxInput, Utxo};
 use bitcoin::util::bip143::SighashComponents;
+use bitcoin::util::sighash::SighashCache;
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex as HashFromHex;
 use bitcoin_hashes::hex::ToHex as HashToHex;
@@ -223,16 +224,22 @@ impl SegWitTransactionSignComponent {
         keys: &[impl PrivateKey],
     ) -> Result<Vec<(Vec<u8>, Vec<u8>)>> {
         let mut witnesses: Vec<(Vec<u8>, Vec<u8>)> = vec![];
-        let shc = SighashComponents::new(&tx);
+        let mut shc = SighashCache::new(tx);
         for i in 0..tx.input.len() {
-            let tx_in = &tx.input[i];
+            //let tx_in = &tx.input[i];
             let unspent = &unspents[i];
             let pub_key = &keys[i].public_key();
             let pub_key_bytes = pub_key.to_bytes();
             let pub_key_hash = hash160::Hash::hash(&pub_key_bytes).into_inner();
+            println!("pub_key_hash ----- {:02x?}", pub_key_hash);
             let script_hex = format!("76a914{}88ac", hex::encode(pub_key_hash));
             let script = Script::from(hex::decode(script_hex)?);
-            let hash = shc.sighash_all(tx_in, &script, unspent.amount as u64);
+            let hash = shc.segwit_signature_hash(
+                i,
+                &script,
+                unspent.amount as u64,
+                bitcoin::EcdsaSighashType::All,
+            )?;
 
             let prv_key = &keys[i];
             witnesses.push(Self::sign_hash_and_pub_key(
@@ -261,6 +268,7 @@ impl BitcoinTransactionSignComponent for SegWitTransactionSignComponent {
                 let pub_key_bytes = pub_key.to_bytes();
                 let hash = hash160::Hash::hash(&pub_key_bytes).into_inner();
                 let hex = format!("160014{}", hex::encode(&hash));
+                //let hex = format!("76a914{}88ac", hex::encode(&hash));
 
                 TxIn {
                     script_sig: Script::from(hex::decode(hex).expect("script_sig")),

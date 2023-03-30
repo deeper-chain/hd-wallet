@@ -48,8 +48,11 @@ impl Address for BtcForkAddress {
         tcx_ensure!(network.is_some(), Error::MissingNetwork);
         let network = network.expect("network");
 
-        let addr = if coin.seg_wit.as_str() == "P2WPKH" {
+        let seg_str = coin.seg_wit.as_str();
+        let addr = if seg_str == "P2WPKH" {
             BtcForkAddress::p2wpkh(&public_key.to_bytes(), &network)?.to_string()
+        } else if seg_str == "P2SHWPKH" {
+            BtcForkAddress::p2shwpkh(&public_key.to_bytes(), &network)?.to_string()
         } else {
             BtcForkAddress::p2pkh(&public_key.to_bytes(), &network)?.to_string()
         };
@@ -84,6 +87,10 @@ impl BtcForkAddress {
             payload: addr.payload,
             network: network.clone(),
         })
+    }
+
+    pub fn p2sh(_pub_key: &[u8], _network: &BtcForkNetwork) -> Result<BtcForkAddress> {
+        Err(anyhow::anyhow!("not supoort p2sh address"))
     }
 
     pub fn p2wpkh(pub_key: &[u8], network: &BtcForkNetwork) -> Result<BtcForkAddress> {
