@@ -95,10 +95,10 @@ impl BtcForkAddress {
 
     pub fn p2wpkh(pub_key: &[u8], network: &BtcForkNetwork) -> Result<BtcForkAddress> {
         let pub_key = bitcoin::PublicKey::from_slice(&pub_key)?;
-        println!("---- pub_key {}", pub_key.inner);
+        //println!("---- pub_key {}", pub_key.inner);
         let addr = BtcAddress::p2wpkh(&pub_key, Network::Bitcoin)?;
-        println!("---- address {}", addr);
-        println!("---- payload {:?}", addr.payload);
+        // println!("---- address {}", addr);
+        // println!("---- payload {:?}", addr.payload);
         Ok(BtcForkAddress {
             payload: addr.payload,
             network: network.clone(),
@@ -150,23 +150,6 @@ fn bech32_network(bech32: &str) -> Option<BtcForkNetwork> {
     match bech32_prefix {
         Some(prefix) => network_form_hrp(prefix),
         None => None,
-    }
-}
-
-fn decode_base58(addr: &str) -> result::Result<Vec<u8>, BtcAddressError> {
-    // Base58
-    if addr.len() > 50 {
-        return Err(BtcAddressError::Base58(base58::Error::InvalidLength(
-            addr.len() * 11 / 15,
-        )));
-    }
-    let data = base58::from_check(&addr)?;
-    if data.len() != 21 {
-        Err(BtcAddressError::Base58(base58::Error::InvalidLength(
-            data.len(),
-        )))
-    } else {
-        Ok(data)
     }
 }
 
@@ -325,7 +308,7 @@ impl Display for BtcForkAddress {
             }
             Payload::WitnessProgram { version, program } => {
                 let hrp = self.network.hrp;
-                println!("hrp {}", hrp);
+                //println!("hrp {}", hrp);
                 let mut upper_writer;
                 let writer = if fmt.alternate() {
                     upper_writer = UpperWriter(fmt);

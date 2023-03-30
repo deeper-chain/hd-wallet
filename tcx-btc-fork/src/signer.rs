@@ -11,7 +11,6 @@ use std::str::FromStr;
 
 use crate::address::BtcForkAddress;
 use crate::transaction::{BtcForkSignedTxOutput, BtcForkTxInput, Utxo};
-use bitcoin::util::bip143::SighashComponents;
 use bitcoin::util::sighash::SighashCache;
 use bitcoin_hashes::hash160;
 use bitcoin_hashes::hex::FromHex as HashFromHex;
@@ -23,8 +22,6 @@ use tcx_primitive::{
     Bip32DeterministicPublicKey, Derive, DeterministicPublicKey, FromHex, PrivateKey, PublicKey,
     TypedDeterministicPublicKey,
 };
-
-//use bitcoin::util::sighash::SighashCache;
 
 const DUST: u64 = 546;
 const SIGHASH_ALL: u8 = 0x01;
@@ -207,6 +204,7 @@ pub trait BitcoinTransactionSignComponent {
         sign_hash: u8,
     ) -> Result<(Vec<u8>, Vec<u8>)> {
         let signature_bytes = pri_key.sign(&hash)?;
+        //println!("--- signature_bytes {}", hex::encode(&signature_bytes));
         let raw_bytes: Vec<u8> = vec![sign_hash];
         let sig_bytes: Vec<u8> = [signature_bytes, raw_bytes].concat();
         let pub_key = pri_key.public_key();
@@ -230,17 +228,20 @@ impl SegWitTransactionSignComponent {
             let unspent = &unspents[i];
             let pub_key = &keys[i].public_key();
             let pub_key_bytes = pub_key.to_bytes();
+            //println!("pub_key_bytes ----- {}", hex::encode(&pub_key_bytes));
             let pub_key_hash = hash160::Hash::hash(&pub_key_bytes).into_inner();
-            println!("pub_key_hash ----- {:02x?}", pub_key_hash);
+
             let script_hex = format!("76a914{}88ac", hex::encode(pub_key_hash));
+            //println!("pub_key_hash ----- {:?}", script_hex);
             let script = Script::from(hex::decode(script_hex)?);
+
             let hash = shc.segwit_signature_hash(
                 i,
                 &script,
                 unspent.amount as u64,
                 bitcoin::EcdsaSighashType::All,
             )?;
-
+            //println!("sig hash ----- {:?}", hash);
             let prv_key = &keys[i];
             witnesses.push(Self::sign_hash_and_pub_key(
                 prv_key,
@@ -259,19 +260,30 @@ impl BitcoinTransactionSignComponent for SegWitTransactionSignComponent {
         keys: &[impl PrivateKey],
     ) -> Result<Transaction> {
         let witnesses: Vec<(Vec<u8>, Vec<u8>)> = Self::witness_sign(tx, unspents, keys)?;
+
+        //println!(" ---  utxo {:?}", unspents);
+        let is_p2shs: Vec<_> = unspents
+            .iter()
+            .map(|utxo| utxo.script_pub_key.contains("a914"))
+            .collect();
         let input_with_sigs = tx
             .input
             .iter()
+            .zip(is_p2shs.iter())
             .enumerate()
-            .map(|(i, txin)| {
-                let pub_key = &keys[i].public_key();
-                let pub_key_bytes = pub_key.to_bytes();
-                let hash = hash160::Hash::hash(&pub_key_bytes).into_inner();
-                let hex = format!("160014{}", hex::encode(&hash));
-                //let hex = format!("76a914{}88ac", hex::encode(&hash));
+            .map(|(i, (txin, is_p2sh))| {
+                let script_sig = if *is_p2sh {
+                    let pub_key = &keys[i].public_key();
+                    let pub_key_bytes = pub_key.to_bytes();
+                    let hash = hash160::Hash::hash(&pub_key_bytes).into_inner();
+                    let hex = format!("160014{}", hex::encode(&hash));
+                    Script::from(hex::decode(hex).expect("script_sig"))
+                } else {
+                    Script::new()
+                };
 
                 TxIn {
-                    script_sig: Script::from(hex::decode(hex).expect("script_sig")),
+                    script_sig,
                     witness: bitcoin::Witness::from_vec(vec![
                         witnesses[i].0.clone(),
                         witnesses[i].1.clone(),
