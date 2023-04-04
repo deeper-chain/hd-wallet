@@ -463,7 +463,7 @@ pub fn export_private_key(data: &str) -> Result<String> {
     };
 
     // private_key prefix is only about chain type and network
-    let coin_info = coin_info_from_param(&param.chain_type, &param.network, "", "")?;
+    //let coin_info = coin_info_from_param(&param.chain_type, &param.network, "", "")?;
     let value = if ["TRON", "POLKADOT", "KUSAMA", "ETHEREUM", "DEEPER"]
         .contains(&param.chain_type.as_str())
     {

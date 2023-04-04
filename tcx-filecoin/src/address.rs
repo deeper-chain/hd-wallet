@@ -2,72 +2,49 @@ use tcx_chain::{Address, Result};
 use tcx_constants::CoinInfo;
 use tcx_primitive::{PublicKey, TypedPublicKey};
 
-use forest_address::Address as ForestAddress;
+use forest_address::{Address as ForestAddress, Network};
 
 use super::Error;
-use crate::utils::{digest, HashSize};
-use base32::Alphabet;
 use std::str::FromStr;
 
 const MAINNET_PREFIX: &'static str = "f";
 const TESTNET_PREFIX: &'static str = "t";
 
-#[derive(Clone, Copy)]
-pub enum Protocol {
-    Secp256k1 = 1,
-    BLS = 3,
-}
-
 pub struct FilecoinAddress();
-
-impl FilecoinAddress {
-    fn checksum(ingest: &[u8]) -> Vec<u8> {
-        digest(ingest, HashSize::Checksum)
-    }
-
-    fn address_hash(ingest: &[u8]) -> Vec<u8> {
-        digest(ingest, HashSize::Payload)
-    }
-}
 
 impl Address for FilecoinAddress {
     fn from_public_key(public_key: &TypedPublicKey, coin: &CoinInfo) -> Result<String> {
-        let ntwk = match coin.network.as_str() {
-            "TESTNET" => TESTNET_PREFIX,
-            _ => MAINNET_PREFIX,
-        };
-        let protocol;
-        let payload;
-        let cksm;
-
+        let network = coin.network.as_str();
         match public_key {
             TypedPublicKey::Secp256k1(pk) => {
-                protocol = Protocol::Secp256k1;
-                payload = Self::address_hash(&pk.to_uncompressed());
+                let mut pk = pk.clone();
+                pk.0.compressed = false;
+                let bytes = pk.to_uncompressed();
 
-                cksm = Self::checksum(&[vec![protocol as u8], payload.clone().to_vec()].concat());
+                let mut address = ForestAddress::new_secp256k1(&bytes)?;
+                if network == "TESTNET" {
+                    address.set_network(Network::Testnet);
+                } else {
+                    address.set_network(Network::Mainnet);
+                }
+                let addr_hex = format!("{}", address);
+                Ok(addr_hex)
             }
             TypedPublicKey::BLS(pk) => {
-                protocol = Protocol::BLS;
-                payload = pk.to_bytes();
-
-                cksm = Self::checksum(&[vec![protocol as u8], payload.clone().to_vec()].concat());
+                let bytes = pk.to_bytes();
+                let mut address = ForestAddress::new_bls(&bytes)?;
+                if network == "TESTNET" {
+                    address.set_network(Network::Testnet);
+                } else {
+                    address.set_network(Network::Mainnet);
+                }
+                let addr_hex = format!("{}", address);
+                Ok(addr_hex)
             }
             _ => {
                 return Err(Error::InvalidCurveType.into());
             }
-        };
-
-        Ok(format!(
-            "{}{}{}",
-            ntwk,
-            protocol as i8,
-            base32::encode(
-                Alphabet::RFC4648 { padding: false },
-                &[payload, cksm].concat()
-            )
-            .to_lowercase()
-        ))
+        }
     }
 
     fn is_valid(address: &str, coin: &CoinInfo) -> bool {

@@ -30,7 +30,6 @@ pub struct Signature {
 pub struct SignedMessage {
     pub cid: std::string::String,
 
-    pub message: ::std::option::Option<UnsignedMessage>,
-
-    pub signature: ::std::option::Option<Signature>,
+    //pub message: ::std::option::Option<UnsignedMessage>,
+    pub signature: String,
 }

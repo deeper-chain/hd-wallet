@@ -65,14 +65,6 @@ pub fn call_api(method: &str, msg: impl Serialize) -> Result<Vec<u8>> {
     }
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn free_const_string(s: *const c_char) {
-    if s.is_null() {
-        return;
-    }
-    CStr::from_ptr(s);
-}
-
 /// dispatch protobuf rpc call
 ///
 #[allow(deprecated)]

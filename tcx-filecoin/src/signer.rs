@@ -1,4 +1,4 @@
-use crate::transaction::{Signature, SignedMessage, UnsignedMessage};
+use crate::transaction::{SignedMessage, UnsignedMessage};
 use crate::utils::{digest, HashSize};
 use crate::Error;
 use forest_address::Address;
@@ -58,7 +58,6 @@ impl TransactionSigner<UnsignedMessage, SignedMessage> for Keystore {
         let unsigned_message = forest_message::UnsignedMessage::try_from(tx)?;
 
         let account = self.account(symbol, address);
-        let signature_type;
 
         if account.is_none() {
             return Err(Error::CannotFoundAccount.into());
@@ -66,9 +65,8 @@ impl TransactionSigner<UnsignedMessage, SignedMessage> for Keystore {
 
         let signature;
         let mut cid: Cid = unsigned_message.cid()?;
-        match account.unwrap().curve {
+        let sig_data = match account.unwrap().curve {
             CurveType::SECP256k1 => {
-                signature_type = 1;
                 signature = self.sign_recoverable_hash(
                     &digest(&cid.to_bytes(), HashSize::Default),
                     symbol,
@@ -77,29 +75,36 @@ impl TransactionSigner<UnsignedMessage, SignedMessage> for Keystore {
                 )?;
 
                 let forest_sig = forest_crypto::Signature::new_secp256k1(signature.clone());
-                let forest_signed_msg = forest_message::SignedMessage {
-                    message: unsigned_message,
-                    signature: forest_sig,
-                };
+                let forest_signed_msg =
+                    forest_message::SignedMessage::new_from_parts(unsigned_message, forest_sig);
+                let forest_signed_msg = forest_signed_msg.unwrap();
                 cid = forest_signed_msg
                     .cid()
                     .map_err(|_e| anyhow::anyhow!("{}", "forest_message cid error"))?;
+
+                forest_signed_msg.marshal_cbor()?
             }
             CurveType::BLS => {
-                signature_type = 2;
                 signature = self.sign_hash(&cid.to_bytes(), symbol, address, None)?;
-                cid = unsigned_message.cid()?;
+
+                let forest_sig = forest_crypto::Signature::new_bls(signature.clone());
+                let forest_signed_msg =
+                    forest_message::SignedMessage::new_from_parts(unsigned_message, forest_sig);
+
+                let forest_signed_msg = forest_signed_msg.unwrap();
+
+                cid = forest_signed_msg
+                    .cid()
+                    .map_err(|_e| anyhow::anyhow!("{}", "forest_message cid error"))?;
+                //forest_signed_msg.marshal_cbor()?
+                forest_encoding::to_vec(&forest_signed_msg)?
             }
             _ => return Err(Error::InvalidCurveType.into()),
-        }
+        };
 
         Ok(SignedMessage {
             cid: cid.to_string(),
-            message: Some(tx.clone()),
-            signature: Some(Signature {
-                r#type: signature_type,
-                data: base64::encode(&signature),
-            }),
+            signature: hex::encode(sig_data),
         })
     }
 }
