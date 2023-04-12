@@ -1,5 +1,5 @@
 use crate::transaction::{SubstrateRawTxIn, SubstrateTxOut};
-use crate::{PAYLOAD_HASH_THRESHOLD, SIGNATURE_TYPE_SR25519};
+use crate::PAYLOAD_HASH_THRESHOLD;
 use sp_core::blake2_256;
 
 use tcx_chain::{ChainSigner, Keystore, TransactionSigner as TraitTransactionSigner};
@@ -30,10 +30,11 @@ impl TraitTransactionSigner<SubstrateRawTxIn, SubstrateTxOut> for Keystore {
 
         let sig = self.sign_recoverable_hash(&hash, symbol, address, None)?;
 
-        let sig_with_type = [vec![SIGNATURE_TYPE_SR25519], sig].concat();
+        // no need prefixing 0x01
+        //let sig_with_type = [vec![SIGNATURE_TYPE_SR25519], sig].concat();
 
         let tx_out = SubstrateTxOut {
-            signature: format!("0x{}", hex::encode(sig_with_type)),
+            signature: format!("0x{}", hex::encode(sig)),
         };
         Ok(tx_out)
     }
