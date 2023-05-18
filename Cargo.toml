@@ -10,6 +10,7 @@ members = [
     "tcx-ckb",
     "tcx-substrate",
     "tcx-filecoin",
+    "tcx-sui",
     "tcx",
     "tcx-tezos",
 	"tcx-ethereum",

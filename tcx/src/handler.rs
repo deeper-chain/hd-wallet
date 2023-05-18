@@ -18,6 +18,7 @@ use tcx_ckb::{CkbAddress, CkbTxInput};
 use tcx_crypto::{XPUB_COMMON_IV, XPUB_COMMON_KEY_128};
 use tcx_ethereum::{EthereumAddress, EthereumTxIn};
 use tcx_filecoin::{FilecoinAddress, KeyInfo, UnsignedMessage};
+use tcx_sui::{SuiAddress, SuiRawTxIn, SuiTxOut};
 use tcx_tron::TrxAddress;
 
 use crate::api_json::{
@@ -69,6 +70,7 @@ fn derive_account<'a, 'b>(keystore: &mut Keystore, derivation: &Derivation) -> R
         "TEZOS" => keystore.derive_coin::<TezosAddress>(&coin_info),
         "FILECOIN" => keystore.derive_coin::<FilecoinAddress>(&coin_info),
         "ETHEREUM" => keystore.derive_coin::<EthereumAddress>(&coin_info),
+        "SUI" => keystore.derive_coin::<SuiAddress>(&coin_info),
         _ => Err(format_err!("unsupported_chain")),
     }
 }
@@ -633,6 +635,7 @@ pub fn sign_tx(data: &str) -> Result<String> {
         "FILECOIN" => sign_filecoin_tx(&param, guard.keystore_mut()),
         "TEZOS" => sign_tezos_tx_raw(&param, guard.keystore_mut()),
         "ETHEREUM" => sign_ethereum_tx_raw(&param, guard.keystore_mut()),
+        "SUI" => sign_sui_tx(&param, guard.keystore_mut()),
         _ => Err(format_err!("unsupported_chain")),
     }
 }
@@ -678,6 +681,13 @@ pub fn get_public_key(data: &str) -> Result<String> {
 pub fn sign_filecoin_tx(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
     let input: UnsignedMessage =
         serde_json::from_str(&param.input.to_string()).expect("FilecoinTxIn");
+
+    let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
+    encode_message_to_string(&signed_tx)
+}
+
+pub fn sign_sui_tx(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
+    let input: SuiRawTxIn = serde_json::from_str(&param.input.to_string()).expect("FilecoinTxIn");
 
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message_to_string(&signed_tx)

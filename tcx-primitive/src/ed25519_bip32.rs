@@ -58,7 +58,6 @@ impl Derive for Ed25519DeterministicPrivateKey {
             };
             extended_key = extended_key.derive_hardened_child(chain_index).unwrap();
         }
-
         Ok(Ed25519DeterministicPrivateKey(extended_key))
     }
 }

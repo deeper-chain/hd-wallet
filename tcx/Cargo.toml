@@ -17,7 +17,7 @@ tcx-primitive = { path = "../tcx-primitive" }
 tcx-constants = { path = "../tcx-constants"}
 tcx-tezos = {path = "../tcx-tezos"}
 tcx-ethereum = { path = "../tcx-ethereum" }
-
+tcx-sui = { path = "../tcx-sui" }
 bytes = "0.5.4"
 
 libc = "0.2.0"

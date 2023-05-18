@@ -106,9 +106,7 @@ impl HdKeystore {
         let account = self
             .account(symbol, address)
             .ok_or(Error::AccountNotFound)?;
-
         let root = TypedDeterministicPrivateKey::from_mnemonic(account.curve, &cache.mnemonic)?;
-
         Ok(root.derive(&account.derivation_path)?.private_key())
     }
 
