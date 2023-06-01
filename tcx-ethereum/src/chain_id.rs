@@ -88,6 +88,16 @@ lazy_static! {
             network_id: 1285,
             chain_id: 1285,
         });
+        chain_infos.push(ChainInfo {
+            network: "FANTOM".to_string(),
+            network_id: 250,
+            chain_id: 250,
+        });
+        chain_infos.push(ChainInfo {
+            network: "HARMONY".to_string(),
+            network_id: 1666600000,
+            chain_id: 1666600000,
+        });
         RwLock::new(chain_infos)
     };
 }
