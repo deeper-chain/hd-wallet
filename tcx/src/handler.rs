@@ -18,6 +18,7 @@ use tcx_ckb::{CkbAddress, CkbTxInput};
 use tcx_crypto::{XPUB_COMMON_IV, XPUB_COMMON_KEY_128};
 use tcx_ethereum::{EthereumAddress, EthereumTxIn};
 use tcx_filecoin::{FilecoinAddress, KeyInfo, UnsignedMessage};
+use tcx_solana::{SolanaAddress, SolanaRawTxIn};
 use tcx_sui::{SuiAddress, SuiRawTxIn, SuiTxOut};
 use tcx_tron::TrxAddress;
 
@@ -71,6 +72,7 @@ fn derive_account<'a, 'b>(keystore: &mut Keystore, derivation: &Derivation) -> R
         "FILECOIN" => keystore.derive_coin::<FilecoinAddress>(&coin_info),
         "ETHEREUM" => keystore.derive_coin::<EthereumAddress>(&coin_info),
         "SUI" => keystore.derive_coin::<SuiAddress>(&coin_info),
+        "SOLANA" => keystore.derive_coin::<SolanaAddress>(&coin_info),
         _ => Err(format_err!("unsupported_chain")),
     }
 }
@@ -466,8 +468,10 @@ pub fn export_private_key(data: &str) -> Result<String> {
 
     // private_key prefix is only about chain type and network
     //let coin_info = coin_info_from_param(&param.chain_type, &param.network, "", "")?;
-    let value = if ["TRON", "POLKADOT", "KUSAMA", "ETHEREUM", "DEEPER"]
-        .contains(&param.chain_type.as_str())
+    let value = if [
+        "TRON", "POLKADOT", "KUSAMA", "ETHEREUM", "DEEPER", "SOLANA", "SUI",
+    ]
+    .contains(&param.chain_type.as_str())
     {
         Ok(pk_hex.to_string())
     } else if "FILECOIN".contains(&param.chain_type.as_str()) {
@@ -636,6 +640,7 @@ pub fn sign_tx(data: &str) -> Result<String> {
         "TEZOS" => sign_tezos_tx_raw(&param, guard.keystore_mut()),
         "ETHEREUM" => sign_ethereum_tx_raw(&param, guard.keystore_mut()),
         "SUI" => sign_sui_tx(&param, guard.keystore_mut()),
+        "SOLANA" => sign_solana_tx(&param, guard.keystore_mut()),
         _ => Err(format_err!("unsupported_chain")),
     }
 }
@@ -687,7 +692,15 @@ pub fn sign_filecoin_tx(param: &SignParam, keystore: &mut Keystore) -> Result<St
 }
 
 pub fn sign_sui_tx(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
-    let input: SuiRawTxIn = serde_json::from_str(&param.input.to_string()).expect("FilecoinTxIn");
+    let input: SuiRawTxIn = serde_json::from_str(&param.input.to_string()).expect("SuiRawTxIn");
+
+    let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
+    encode_message_to_string(&signed_tx)
+}
+
+pub fn sign_solana_tx(param: &SignParam, keystore: &mut Keystore) -> Result<String> {
+    let input: SolanaRawTxIn =
+        serde_json::from_str(&param.input.to_string()).expect("SolanaRawTxIn");
 
     let signed_tx = keystore.sign_transaction(&param.chain_type, &param.address, &input)?;
     encode_message_to_string(&signed_tx)

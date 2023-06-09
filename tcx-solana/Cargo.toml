@@ -1,0 +1,29 @@
+[package]
+name = "tcx-solana"
+version = "0.1.0"
+authors = ["yubo <huoqiutianyu@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tcx-crypto = { path = "../tcx-crypto" }
+tcx-chain = { path = "../tcx-chain" }
+tcx-primitive = { path = "../tcx-primitive" }
+tcx-constants = { path = "../tcx-constants" }
+
+bytes = "0.5.4"
+blake2b-rs = "0.1.5"
+thiserror = "1.0"
+anyhow = "1.0"
+byteorder = "1.3.2"
+base32 = "^0.4.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+
+hex = "0.4.0"
+lazy_static = "1.4.0"
+
+bs58 = "0.5"
+sha2 = "0.8.0"

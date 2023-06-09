@@ -439,6 +439,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "476e9cd489f9e121e02ffa6014a8ef220ecb15c05ed23fc34cca13925dc283fb"
 
 [[package]]
+name = "bs58"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5353f36341f7451062466f0b755b96ac3a9547e4d7f6b70d603fc721a7d7896"
+dependencies = [
+ "tinyvec",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3765,6 +3774,7 @@ dependencies = [
  "tcx-ethereum",
  "tcx-filecoin",
  "tcx-primitive",
+ "tcx-solana",
  "tcx-substrate",
  "tcx-sui",
  "tcx-tezos",
@@ -3986,6 +3996,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "tcx-solana"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base32",
+ "blake2b-rs",
+ "bs58 0.5.0",
+ "byteorder 1.4.3",
+ "bytes 0.5.6",
+ "hex 0.4.3",
+ "lazy_static",
+ "serde",
+ "serde_json",
+ "sha2 0.8.2",
+ "tcx-chain",
+ "tcx-constants",
+ "tcx-crypto",
+ "tcx-primitive",
+ "thiserror",
+]
+
+[[package]]
 name = "tcx-substrate"
 version = "0.1.0"
 dependencies = [
@@ -4180,9 +4212,9 @@ dependencies = [
 
 [[package]]
 name = "tinyvec"
-version = "1.1.0"
+version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccf8dbc19eb42fba10e8feaaec282fb50e2c14b2726d6301dbfeed0f73306a6f"
+checksum = "87cc5ceb3875bb20c2890005a4e226a4651264a5c75edb2421b52861a0a0cb50"
 dependencies = [
  "tinyvec_macros",
 ]

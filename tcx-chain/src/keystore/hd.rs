@@ -181,11 +181,8 @@ impl HdKeystore {
         let cache = self.cache.as_ref().ok_or(Error::KeystoreLocked)?;
         let root = TypedDeterministicPrivateKey::from_mnemonic(coin_info.curve, &cache.mnemonic)?;
         let private_key = root.derive(&coin_info.derivation_path)?.private_key();
-
         let public_key = private_key.public_key();
         let address = A::from_public_key(&public_key, coin_info)?;
-
-        //println!("---- derive-coin coin_info {:?}", coin_info);
         // todo: ext_pub_key
         let ext_pub_key = match coin_info.curve {
             CurveType::SubSr25519 | CurveType::BLS | CurveType::ED25519 => "".to_owned(),
@@ -209,7 +206,7 @@ impl HdKeystore {
             seg_wit: coin_info.seg_wit.to_string(),
             public_key: Some(hex::encode(public_key.to_bytes())),
         };
-        // println!("---- derive-coin fat account {:?}", account);
+        //println!("---- derive-coin fat account {:?}", account);
         if let Some(_) = self
             .store
             .active_accounts

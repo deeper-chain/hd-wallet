@@ -242,6 +242,20 @@ lazy_static! {
             network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
+        coin_infos.push(CoinInfo {
+            coin: "SOLANA".to_string(),
+            derivation_path: "m/44'/501'/0'/0'/0'".to_string(),
+            curve: CurveType::ED25519,
+            network: "MAINNET".to_string(),
+            seg_wit: "NONE".to_string(),
+        });
+        coin_infos.push(CoinInfo {
+            coin: "SOLANA".to_string(),
+            derivation_path: "m/44'/501'/0'/0'/0'".to_string(),
+            curve: CurveType::SECP256k1,
+            network: "MAINNET".to_string(),
+            seg_wit: "NONE".to_string(),
+        });
         RwLock::new(coin_infos)
     };
 }
