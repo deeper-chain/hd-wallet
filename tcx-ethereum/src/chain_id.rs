@@ -6,7 +6,7 @@ pub use anyhow::Result;
 #[derive(Clone)]
 pub struct ChainInfo {
     pub network: String,
-    pub network_id: i32,
+    pub network_id: u64,
     pub chain_id: u64,
 }
 
@@ -98,6 +98,38 @@ lazy_static! {
             network_id: 1666600000,
             chain_id: 1666600000,
         });
+        chain_infos.push(ChainInfo {
+            network: "CELO".to_string(),
+            network_id: 42220,
+            chain_id: 42220,
+        });
+        chain_infos.push(ChainInfo {
+            network: "LINEA_GEO".to_string(),
+            network_id: 59140,
+            chain_id: 59140,
+        });
+        chain_infos.push(ChainInfo {
+            network: "PALM_MAINET".to_string(),
+            network_id: 11297108109,
+            chain_id: 11297108109,
+        });
+        chain_infos.push(ChainInfo {
+            network: "PALM_TESTNET".to_string(),
+            network_id: 11297108099,
+            chain_id: 11297108099,
+        });
+
+        chain_infos.push(ChainInfo {
+            network: "AURORA_MAINET".to_string(),
+            network_id: 1313161554,
+            chain_id: 1313161554,
+        });
+        chain_infos.push(ChainInfo {
+            network: "AURORA_TESTNET".to_string(),
+            network_id: 1313161555,
+            chain_id: 1313161555,
+        });
+
         RwLock::new(chain_infos)
     };
 }
