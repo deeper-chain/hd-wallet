@@ -78,6 +78,18 @@ fn handle_input_msg(input: String) {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let _ = handler::scan_keystores();
-    handle_input_msg(args[2].clone());
+    let len = args.len();
+    if len < 2 {
+        println!("args not enough");
+        return;
+    }
+    if args[1] == "scan_keystores" {
+        println!("{}", handler::scan_keystores().unwrap())
+    } else {
+        if len < 3 {
+            println!("args not enough")
+        }
+        let _ = handler::scan_keystores();
+        handle_input_msg(args[2].clone());
+    }
 }

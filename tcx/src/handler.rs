@@ -28,7 +28,7 @@ use crate::api_json::{
     InitTokenCoreXParam, KeyType, KeystoreCommonAccountsParam, KeystoreCommonDeriveParam,
     KeystoreCommonExistsParam, KeystoreCommonExistsResult, KeystoreCommonExportResult,
     PrivateKeyStoreExportParam, PrivateKeyStoreImportParam, PublicKeyParam, PublicKeyResult,
-    Response, SignParam, WalletKeyParam, WalletResult,
+    Response, SignParam, WalletIds, WalletKeyParam, WalletResult,
 };
 use crate::filemanager::{cache_keystore, clean_keystore, flush_keystore, WALLET_FILE_DIR};
 use crate::filemanager::{delete_keystore_file, KEYSTORE_MAP};
@@ -100,11 +100,13 @@ pub fn init_token_core_x(data: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn scan_keystores() -> Result<()> {
+pub fn scan_keystores() -> Result<String> {
     clean_keystore();
     let file_dir = WALLET_FILE_DIR.read();
     let p = Path::new(file_dir.as_str());
     let walk_dir = std::fs::read_dir(p).expect("read dir");
+    let mut ids = Vec::new();
+
     for entry in walk_dir {
         let entry = entry.expect("DirEntry");
         let fp = entry.path();
@@ -129,10 +131,12 @@ pub fn scan_keystores() -> Result<()> {
             || version == i64::from(PrivateKeystore::VERSION)
         {
             let keystore = Keystore::from_json(&contents)?;
+            ids.push(keystore.id().to_owned());
             cache_keystore(keystore);
         }
     }
-    Ok(())
+    let wallet_ids = WalletIds { ids };
+    encode_message_to_string(wallet_ids)
 }
 
 pub fn hd_store_create(data: &str) -> Result<String> {

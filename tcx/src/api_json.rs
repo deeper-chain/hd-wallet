@@ -28,6 +28,11 @@ pub struct InitTokenCoreXParam {
 }
 
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+pub struct WalletIds {
+    pub ids: ::std::vec::Vec<std::string::String>,
+}
+
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct ExportPrivateKeyParam {
     pub id: std::string::String,
 
