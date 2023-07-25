@@ -14,123 +14,133 @@ lazy_static! {
     static ref CHAIN_INFOS: RwLock<Vec<ChainInfo>> = {
         let mut chain_infos = Vec::new();
         chain_infos.push(ChainInfo {
-            network: "MAINNET".to_string(),
+            network: "mainnet".to_string(),
             network_id: 1,
             chain_id: 1,
         });
         chain_infos.push(ChainInfo {
-            network: "ROPSTEN".to_string(),
-            network_id: 3,
-            chain_id: 3,
+            network: "sepolia".to_string(),
+            network_id: 58008,
+            chain_id: 58008,
         });
         chain_infos.push(ChainInfo {
-            network: "RINKEBY".to_string(),
-            network_id: 4,
-            chain_id: 4,
-        });
-        chain_infos.push(ChainInfo {
-            network: "GOERLI".to_string(),
+            network: "goerli".to_string(),
             network_id: 5,
             chain_id: 5,
         });
         chain_infos.push(ChainInfo {
-            network: "KOVAN".to_string(),
+            network: "kovan".to_string(),
             network_id: 42,
             chain_id: 42,
         });
         chain_infos.push(ChainInfo {
-            network: "BNBMAIN".to_string(),
+            network: "bnbsmartchain-mainnet".to_string(),
             network_id: 56,
             chain_id: 56,
         });
         chain_infos.push(ChainInfo {
-            network: "BNBTEST".to_string(),
+            network: "bnbsmartchain-testnet".to_string(),
             network_id: 97,
             chain_id: 97,
         });
         chain_infos.push(ChainInfo {
-            network: "POLYGON".to_string(),
+            network: "polygon-mainnet".to_string(),
             network_id: 137,
             chain_id: 137,
         });
         chain_infos.push(ChainInfo {
-            network: "MUMBAI".to_string(),
+            network: "polygon-mumbai".to_string(),
             network_id: 80001,
             chain_id: 80001,
         });
         chain_infos.push(ChainInfo {
-            network: "ARBITRUM".to_string(),
+            network: "arbitrum-mainnet".to_string(),
             network_id: 42161,
             chain_id: 42161,
         });
         chain_infos.push(ChainInfo {
-            network: "ARB_GEO".to_string(),
+            network: "arbitrum-goerli".to_string(),
             network_id: 421613,
             chain_id: 421613,
         });
         chain_infos.push(ChainInfo {
-            network: "OPTIMISM".to_string(),
+            network: "optimism-mainnet".to_string(),
             network_id: 10,
             chain_id: 10,
         });
         chain_infos.push(ChainInfo {
-            network: "AVALANCHE".to_string(),
+            network: "optimism-goerli".to_string(),
+            network_id: 420,
+            chain_id: 420,
+        });
+        chain_infos.push(ChainInfo {
+            network: "avalanche-mainnet".to_string(),
             network_id: 43114,
             chain_id: 43114,
         });
         chain_infos.push(ChainInfo {
-            network: "MOONBEAM".to_string(),
+            network: "avalanche-fuji".to_string(),
+            network_id: 43113,
+            chain_id: 43113,
+        });
+        chain_infos.push(ChainInfo {
+            network: "moonbeam".to_string(),
             network_id: 1284,
             chain_id: 1284,
         });
         chain_infos.push(ChainInfo {
-            network: "MOONRIVER".to_string(),
+            network: "moonriver".to_string(),
             network_id: 1285,
             chain_id: 1285,
         });
         chain_infos.push(ChainInfo {
-            network: "FANTOM".to_string(),
+            network: "fantom".to_string(),
             network_id: 250,
             chain_id: 250,
         });
         chain_infos.push(ChainInfo {
-            network: "BASE".to_string(),
+            network: "base-goerli".to_string(),
             network_id: 8453,
             chain_id: 8453,
         });
         chain_infos.push(ChainInfo {
-            network: "HARMONY".to_string(),
+            network: "harmony".to_string(),
             network_id: 1666600000,
             chain_id: 1666600000,
         });
         chain_infos.push(ChainInfo {
-            network: "CELO".to_string(),
+            network: "celo-mainnet".to_string(),
             network_id: 42220,
             chain_id: 42220,
         });
         chain_infos.push(ChainInfo {
-            network: "LINEA_GEO".to_string(),
+            network: "celo-alfajores".to_string(),
+            network_id: 44787,
+            chain_id: 44787,
+        });
+        chain_infos.push(ChainInfo {
+            network: "linea-goerli".to_string(),
             network_id: 59140,
             chain_id: 59140,
         });
         chain_infos.push(ChainInfo {
-            network: "PALM_MAINET".to_string(),
+            network: "palm-mainnet".to_string(),
             network_id: 11297108109,
             chain_id: 11297108109,
         });
         chain_infos.push(ChainInfo {
-            network: "PALM_TESTNET".to_string(),
+            network: "palm-testnet".to_string(),
             network_id: 11297108099,
             chain_id: 11297108099,
         });
 
         chain_infos.push(ChainInfo {
-            network: "AURORA_MAINET".to_string(),
+            network: "aurora-mainnet".to_string(),
             network_id: 1313161554,
             chain_id: 1313161554,
         });
         chain_infos.push(ChainInfo {
-            network: "AURORA_TESTNET".to_string(),
+            network: "aurora-testnet".to_string(),
             network_id: 1313161555,
             chain_id: 1313161555,
         });
