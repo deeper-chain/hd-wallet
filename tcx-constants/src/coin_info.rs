@@ -131,7 +131,28 @@ lazy_static! {
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
+            coin: "POLKADOT".to_string(),
+            derivation_path: "".to_string(),
+            curve: CurveType::ED25519,
+            network: "".to_string(),
+            seg_wit: "".to_string(),
+        });
+        coin_infos.push(CoinInfo {
             coin: "KUSAMA".to_string(),
+            derivation_path: "".to_string(),
+            curve: CurveType::SubSr25519,
+            network: "".to_string(),
+            seg_wit: "".to_string(),
+        });
+        coin_infos.push(CoinInfo {
+            coin: "KUSAMA".to_string(),
+            derivation_path: "".to_string(),
+            curve: CurveType::ED25519,
+            network: "".to_string(),
+            seg_wit: "".to_string(),
+        });
+        coin_infos.push(CoinInfo {
+            coin: "DEEPER".to_string(),
             derivation_path: "".to_string(),
             curve: CurveType::SubSr25519,
             network: "".to_string(),
@@ -140,7 +161,7 @@ lazy_static! {
         coin_infos.push(CoinInfo {
             coin: "DEEPER".to_string(),
             derivation_path: "".to_string(),
-            curve: CurveType::SubSr25519,
+            curve: CurveType::ED25519,
             network: "".to_string(),
             seg_wit: "".to_string(),
         });
