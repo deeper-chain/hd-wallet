@@ -22,84 +22,84 @@ lazy_static! {
             coin: "BITCOIN".to_string(),
             derivation_path: "m/44'/0'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "BITCOIN".to_string(),
             derivation_path: "m/44'/1'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "BITCOIN".to_string(),
             derivation_path: "m/84'/0'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "P2WPKH".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "BITCOIN".to_string(),
             derivation_path: "m/84'/1'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "P2WPKH".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "BITCOIN".to_string(),
             derivation_path: "m/49'/0'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "P2SHWPKH".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "BITCOIN".to_string(),
             derivation_path: "m/49'/1'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "P2SHWPKH".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "BITCOINCASH".to_string(),
             derivation_path: "m/44'/145'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "BITCOINCASH".to_string(),
             derivation_path: "m/44'/1'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "LITECOIN".to_string(),
             derivation_path: "m/44'/2'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "LITECOIN".to_string(),
             derivation_path: "m/44'/1'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "LITECOIN".to_string(),
             derivation_path: "m/49'/2'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "P2WPKH".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "LITECOIN".to_string(),
             derivation_path: "m/49'/1'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "P2WPKH".to_string(),
         });
         coin_infos.push(CoinInfo {
@@ -113,14 +113,14 @@ lazy_static! {
             coin: "NERVOS".to_string(),
             derivation_path: "m/44'/309'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "NERVOS".to_string(),
             derivation_path: "m/44'/309'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
@@ -169,77 +169,77 @@ lazy_static! {
             coin: "TEZOS".to_string(),
             derivation_path: "m/44'/1729'/0'/0'".to_string(),
             curve: CurveType::ED25519,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "FILECOIN".to_string(),
             derivation_path: "m/44'/461'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "FILECOIN".to_string(),
             derivation_path: "m/44'/461'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "FILECOIN".to_string(),
             derivation_path: "m/2334/461/0/0".to_string(),
             curve: CurveType::BLS,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "FILECOIN".to_string(),
             derivation_path: "m/2334/461/0/0".to_string(),
             curve: CurveType::BLS,
-            network: "testnet".to_string(),
+            network: "TESTNET".to_string(),
             seg_wit: "".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "goerli".to_string(),
+            network: "GOERLI".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "sepolia".to_string(),
+            network: "SEPOLIA".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "kovan".to_string(),
+            network: "KOVAN".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/714'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "bnbsmartchain-mainnet".to_string(),
+            network: "BNBSMARTCHAIN-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/714'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "bnbsmartchain-testnet".to_string(),
+            network: "BNBSMARTCHAIN-TESTNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
 
@@ -247,77 +247,77 @@ lazy_static! {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "polygon-mainnet".to_string(),
+            network: "POLYGON-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "polygon-mumbai".to_string(),
+            network: "POLYGON-MUMBAI".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "arbitrum-mainnet".to_string(),
+            network: "ARBITRUM-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "arbitrum-goerli".to_string(),
+            network: "ARBITRUM-GOERLI".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "optimism-mainnet".to_string(),
+            network: "OPTIMISM-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "optimism-goerli".to_string(),
+            network: "OPTIMISM-GOERLI".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "avalanche-mainnet".to_string(),
+            network: "AVALANCHE-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "avalanche-fuji".to_string(),
+            network: "AVALANCHE-FUJI".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "moonbeam".to_string(),
+            network: "MOONBEAM".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "moonriver".to_string(),
+            network: "MOONRIVER".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "fantom".to_string(),
+            network: "FANTOM".to_string(),
             seg_wit: "NONE".to_string(),
         });
 
@@ -325,91 +325,84 @@ lazy_static! {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "harmony".to_string(),
+            network: "HARMONY".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "celo-mainnet".to_string(),
+            network: "CELO-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "celo-alfajores".to_string(),
+            network: "CELO-ALFAJORES".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "linea-goerli".to_string(),
+            network: "LINEA-GOERLI".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "palm-mainnet".to_string(),
+            network: "PALM-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "palm-testnet".to_string(),
+            network: "PALM-TESTNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "aurora-mainnet".to_string(),
+            network: "AURORA-MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "aurora-testnet".to_string(),
+            network: "AURORA-TESTNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "ETHEREUM".to_string(),
             derivation_path: "m/44'/60'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "base-goerli".to_string(),
+            network: "BASE-GOERLI".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "SUI".to_string(),
             derivation_path: "m/44'/784'/0'/0'/0'".to_string(),
             curve: CurveType::ED25519,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "SUI".to_string(),
             derivation_path: "m/54'/784'/0'/0/0".to_string(),
             curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         coin_infos.push(CoinInfo {
             coin: "SOLANA".to_string(),
             derivation_path: "m/44'/501'/0'/0'/0'".to_string(),
             curve: CurveType::ED25519,
-            network: "mainnet".to_string(),
-            seg_wit: "NONE".to_string(),
-        });
-        coin_infos.push(CoinInfo {
-            coin: "SOLANA".to_string(),
-            derivation_path: "m/44'/501'/0'/0'/0'".to_string(),
-            curve: CurveType::SECP256k1,
-            network: "mainnet".to_string(),
+            network: "MAINNET".to_string(),
             seg_wit: "NONE".to_string(),
         });
         RwLock::new(coin_infos)

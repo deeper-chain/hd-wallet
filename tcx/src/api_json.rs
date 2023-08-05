@@ -1,4 +1,12 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
+
+fn deserialize_uppercase<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: &str = Deserialize::deserialize(deserializer)?;
+    Ok(s.to_uppercase())
+}
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TcxAction {
@@ -37,9 +45,9 @@ pub struct ExportPrivateKeyParam {
     pub id: std::string::String,
 
     pub password: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub network: std::string::String,
 
     pub main_address: std::string::String,
@@ -113,14 +121,15 @@ pub struct KeystoreCommonDeriveParam {
 }
 
 pub mod keystore_common_derive_param {
-    use super::{Deserialize, Serialize};
+    use super::{deserialize_uppercase, Deserialize, Serialize};
     #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
     pub struct Derivation {
+        #[serde(deserialize_with = "deserialize_uppercase")]
         pub chain_type: std::string::String,
+        #[serde(deserialize_with = "deserialize_uppercase")]
+        pub network: std::string::String,
 
         pub path: std::string::String,
-
-        pub network: std::string::String,
 
         pub seg_wit: std::string::String,
 
@@ -131,6 +140,7 @@ pub mod keystore_common_derive_param {
 }
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct AccountResponse {
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
 
     pub address: std::string::String,
@@ -180,9 +190,9 @@ pub struct PrivateKeyStoreExportParam {
     pub id: std::string::String,
 
     pub password: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub network: std::string::String,
 }
 /// Keystore Common
@@ -224,7 +234,7 @@ pub struct KeystoreCommonAccountsParam {
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct SignParam {
     pub id: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
 
     pub address: std::string::String,
@@ -249,7 +259,7 @@ pub mod sign_param {
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct ExternalAddressParam {
     pub id: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
 
     pub external_idx: u32,
@@ -282,6 +292,7 @@ pub mod external_address_extra {
 }
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct BtcForkDeriveExtraParam {
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub network: std::string::String,
 
     pub seg_wit: std::string::String,
@@ -291,7 +302,7 @@ pub struct HdStoreExtendedPublicKeyParam {
     pub id: std::string::String,
 
     pub password: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
 
     pub address: std::string::String,
@@ -303,7 +314,7 @@ pub struct HdStoreExtendedPublicKeyResponse {
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct PublicKeyParam {
     pub id: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
 
     pub address: std::string::String,
@@ -311,7 +322,7 @@ pub struct PublicKeyParam {
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub struct PublicKeyResult {
     pub id: std::string::String,
-
+    #[serde(deserialize_with = "deserialize_uppercase")]
     pub chain_type: std::string::String,
 
     pub address: std::string::String,
