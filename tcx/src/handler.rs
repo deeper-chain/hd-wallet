@@ -267,10 +267,7 @@ pub fn keystore_common_derive(data: &str) -> Result<String> {
 
     let mut guard = KeystoreGuard::unlock_by_password(keystore, &param.password)?;
     let mut account_responses: Vec<AccountResponse> = vec![];
-    for mut derivation in param.derivations {
-        derivation.chain_type = derivation.chain_type.to_uppercase();
-        derivation.network = derivation.network.to_uppercase();
-
+    for derivation in param.derivations {
         let account = derive_account(guard.keystore_mut(), &derivation)?;
         let enc_xpub = if account.ext_pub_key.is_empty() {
             Ok("".to_string())
@@ -409,16 +406,13 @@ pub fn private_key_store_import(data: &str) -> Result<String> {
     note = "Please use the export_private_key function instead"
 )]
 pub fn private_key_store_export(data: &str) -> Result<String> {
-    let mut param: PrivateKeyStoreExportParam =
+    let param: PrivateKeyStoreExportParam =
         serde_json::from_str(data).expect("private_key_store_export");
     let mut map = KEYSTORE_MAP.write();
     let keystore: &mut Keystore = match map.get_mut(&param.id) {
         Some(keystore) => Ok(keystore),
         _ => Err(format_err!("{}", "wallet_not_found")),
     }?;
-    param.network = param.network.to_uppercase();
-    param.chain_type = param.chain_type.to_uppercase();
-
     let guard = KeystoreGuard::unlock_by_password(keystore, &param.password)?;
 
     let pk_hex = guard.keystore().export()?;
@@ -445,15 +439,12 @@ pub fn private_key_store_export(data: &str) -> Result<String> {
 }
 
 pub fn export_private_key(data: &str) -> Result<String> {
-    let mut param: ExportPrivateKeyParam = serde_json::from_str(data).expect("export_private_key");
+    let param: ExportPrivateKeyParam = serde_json::from_str(data).expect("export_private_key");
     let mut map = KEYSTORE_MAP.write();
     let keystore: &mut Keystore = match map.get_mut(&param.id) {
         Some(keystore) => Ok(keystore),
         _ => Err(format_err!("{}", "wallet_not_found")),
     }?;
-
-    param.chain_type = param.chain_type.to_uppercase();
-    param.network = param.network.to_uppercase();
 
     let mut guard = KeystoreGuard::unlock_by_password(keystore, &param.password)?;
 
@@ -629,8 +620,7 @@ pub fn keystore_common_accounts(data: &str) -> Result<String> {
 }
 
 pub fn sign_tx(data: &str) -> Result<String> {
-    let mut param: SignParam = serde_json::from_str(data).expect("SignTxParam");
-    param.chain_type = param.chain_type.to_uppercase();
+    let param: SignParam = serde_json::from_str(data).expect("SignTxParam");
 
     let mut map = KEYSTORE_MAP.write();
     let keystore: &mut Keystore = match map.get_mut(&param.id) {
@@ -670,7 +660,7 @@ pub fn get_public_key(data: &str) -> Result<String> {
     }?;
 
     let edpk_prefix: Vec<u8> = vec![0x0D, 0x0F, 0x25, 0xD9];
-    match param.chain_type.to_uppercase().as_str() {
+    match param.chain_type.as_str() {
         "TEZOS" => {
             let account = keystore.account(&param.chain_type, &param.address);
             if let Some(acc) = account {
