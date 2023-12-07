@@ -8,11 +8,10 @@ pub struct EthereumAddress();
 
 impl Address for EthereumAddress {
     fn from_public_key(public_key: &TypedPublicKey, _coin: &CoinInfo) -> Result<String> {
-        let pk = public_key.as_secp256k1()?;
+        let mut pk = public_key.as_secp256k1()?.to_owned();
+        pk.0.compressed = false;
         let bytes = pk.to_uncompressed();
-
         let hash = sha3::Keccak256::digest(&bytes[1..]).to_vec().split_off(12);
-
         let address_lower = hex::encode(hash.clone());
         let address = to_checksum(address_lower.as_str());
         Ok(address)
