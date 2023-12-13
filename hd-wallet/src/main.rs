@@ -11,14 +11,10 @@ fn handle_input_msg(input: String) {
         "init_token_core_x" => {
             handler::init_token_core_x(&action.param.to_string()).map(|_| String::new())
         }
-        "scan_keystores" => handler::scan_keystores().map(|_| String::new()),
-        "hd_store_create" => {
-            handler::hd_store_create(&action.param.to_string()).map(|_| String::new())
-        }
+        "scan_keystores" => handler::scan_keystores(),
+        "hd_store_create" => handler::hd_store_create(&action.param.to_string()),
         "hd_store_import" => handler::hd_store_import(&action.param.to_string()),
-        "hd_store_export" => {
-            handler::hd_store_export(&action.param.to_string()).map(|_| String::new())
-        }
+        "hd_store_export" => handler::hd_store_export(&action.param.to_string()),
         "export_mnemonic" => handler::export_mnemonic(&action.param.to_string()),
         "keystore_common_derive" => handler::keystore_common_derive(&action.param.to_string()),
 
