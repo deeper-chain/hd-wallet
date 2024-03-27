@@ -35,8 +35,8 @@ lazy_static! {
         });
         chain_infos.push(ChainInfo {
             network: "KOVAN".to_string(),
-            network_id: 42,
-            chain_id: 42,
+            network_id: 2222,
+            chain_id: 2222,
         });
         chain_infos.push(ChainInfo {
             network: "BNBSMARTCHAIN-MAINNET".to_string(),
@@ -104,7 +104,7 @@ lazy_static! {
             chain_id: 250,
         });
         chain_infos.push(ChainInfo {
-            network: "BASE-GOERLI".to_string(),
+            network: "BASE".to_string(),
             network_id: 8453,
             chain_id: 8453,
         });
