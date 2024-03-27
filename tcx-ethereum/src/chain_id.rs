@@ -20,8 +20,13 @@ lazy_static! {
         });
         chain_infos.push(ChainInfo {
             network: "SEPOLIA".to_string(),
-            network_id: 58008,
-            chain_id: 58008,
+            network_id: 11155111,
+            chain_id: 11155111,
+        });
+        chain_infos.push(ChainInfo {
+            network: "HOLESKY".to_string(),
+            network_id: 17000,
+            chain_id: 17000,
         });
         chain_infos.push(ChainInfo {
             network: "GOERLI".to_string(),
