@@ -34,6 +34,16 @@ lazy_static! {
             chain_id: 5,
         });
         chain_infos.push(ChainInfo {
+            network: "BASE".to_string(),
+            network_id: 8453,
+            chain_id: 8453,
+        });
+        chain_infos.push(ChainInfo {
+            network: "LINEA".to_string(),
+            network_id: 59144,
+            chain_id: 59144,
+        });
+        chain_infos.push(ChainInfo {
             network: "KOVAN".to_string(),
             network_id: 2222,
             chain_id: 2222,
