@@ -104,6 +104,28 @@ lazy_static! {
         networks.push(BtcForkNetwork {
             coin: "BITCOIN",
             network: "MAINNET",
+            seg_wit: "P2TR",
+            hrp: "bc",
+            p2pkh_prefix: 0x0,
+            p2sh_prefix: 0x05,
+            private_prefix: 0x80,
+            xpub_prefix: [0x04, 0xB2, 0x47, 0x46],
+            xprv_prefix: [0x04, 0xB2, 0x43, 0x0C],
+        });
+        networks.push(BtcForkNetwork {
+            coin: "BITCOIN",
+            network: "TESTNET",
+            seg_wit: "P2TR",
+            hrp: "tb",
+            p2pkh_prefix: 0x6f,
+            p2sh_prefix: 0xc4,
+            private_prefix: 0xef,
+            xpub_prefix: [0x04, 0x5F, 0x1C, 0xF6],
+            xprv_prefix: [0x04, 0x5F, 0x18, 0xBC],
+        });
+        networks.push(BtcForkNetwork {
+            coin: "BITCOIN",
+            network: "MAINNET",
             seg_wit: "P2SHWPKH",
             hrp: "bc",
             p2pkh_prefix: 0x0,

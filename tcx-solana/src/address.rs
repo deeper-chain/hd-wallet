@@ -6,7 +6,7 @@ use tcx_primitive::{PublicKey, ToHex, TypedPublicKey};
 pub struct SolanaAddress();
 
 impl Address for SolanaAddress {
-    fn from_public_key(public_key: &TypedPublicKey, coin: &CoinInfo) -> Result<String> {
+    fn from_public_key(public_key: &TypedPublicKey, _coin: &CoinInfo) -> Result<String> {
         match public_key {
             TypedPublicKey::Ed25519(pk) => {
                 let pk_bytes = pk.to_bytes();

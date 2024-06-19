@@ -10,7 +10,7 @@ use anyhow::Result;
 
 lazy_static::lazy_static! {
     pub static ref KEYSTORE_MAP: RwLock<HashMap<String, Keystore>> = RwLock::new(HashMap::new());
-    pub static ref WALLET_FILE_DIR: RwLock<String> = RwLock::new("/var/deeper/coolWallet".to_string());
+    pub static ref WALLET_FILE_DIR: RwLock<String> = RwLock::new("/var/deeper/deeperWallet".to_string());
     pub static ref IS_DEBUG: RwLock<bool> = RwLock::new(false);
 }
 
